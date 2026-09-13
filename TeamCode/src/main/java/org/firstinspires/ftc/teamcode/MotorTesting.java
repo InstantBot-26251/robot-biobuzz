@@ -16,8 +16,8 @@ public class MotorTesting extends OpMode {
 
     @Override
     public void init() {
-        motor = hardwareMap.get(DcMotorEx.class, "motorName");
-        touch = hardwareMap.get(TouchSensor.class, "sensorName");
+        motor = hardwareMap.get(DcMotorEx.class, "1");
+        touch = hardwareMap.get(TouchSensor.class, "touch");
 
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
