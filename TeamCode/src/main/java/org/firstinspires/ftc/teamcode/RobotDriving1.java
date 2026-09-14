@@ -29,18 +29,19 @@ public class RobotDriving1 extends OpMode {
         motor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motor3.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor3.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor3.setDirection(DcMotorSimple.Direction.FORWARD);
 
         motor4.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor4.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor4.setDirection(DcMotorSimple.Direction.FORWARD
+        );
 
     }
 
     @Override
     public void loop() {
-            motor1.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+            motor1.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
             motor2.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-            motor3.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+            motor3.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
             motor4.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
     }
 }
