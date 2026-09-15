@@ -39,9 +39,9 @@ public class RobotDriving1 extends OpMode {
 
     @Override
     public void loop() {
-            motor1.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
-            motor2.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-            motor3.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
-            motor4.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+            motor1.setPower(gamepad1.left_stick_y);
+            motor2.setPower(gamepad1.left_stick_y);
+            motor3.setPower(gamepad1.left_stick_y);
+            motor4.setPower(gamepad1.left_stick_y);
     }
 }
