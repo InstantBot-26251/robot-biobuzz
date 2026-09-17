@@ -11,7 +11,8 @@ public class Constants {
         return null;
     }
 
-    public static MecanumConfig drivetrainConfig = new MecanumConfig(c -> {
+    public static MecanumConfig drivetrainConfig = new MecanumConfig(
+            c -> {
         c.frontLeftName.set("front_left");
         c.frontRightName.set("front_right");
         c.backLeftName.set("back_left");
@@ -20,5 +21,6 @@ public class Constants {
         c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
         c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
         c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+        c.manualBrakeMode.set(true);
     });
 }
