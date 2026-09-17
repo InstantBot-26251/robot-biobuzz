@@ -12,6 +12,7 @@ public class DriverControlled extends OpMode {
     @Override
     public void init() {
         robot = new RobotContainer(hardwareMap, telemetry, gamepad1, gamepad2);
+        robot.teleopInit();
     }
 
     @Override

@@ -9,14 +9,19 @@ import com.seattlesolvers.solverslib.command.Subsystem;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.chassis.Chassis;
+import org.firstinspires.ftc.teamcode.chassis.commands.TeleopDriveCommand;
+import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RobotContainer extends Robot {
-    private final List<Subsystem> subsystems = new ArrayList<>();
+    private final List<SubsystemIF> subsystems = new ArrayList<>();
     private final ElapsedTime timer = new ElapsedTime();
 
+
+    private final Chassis chassis;
 
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
@@ -32,7 +37,9 @@ public class RobotContainer extends Robot {
         this.gamepad1 = new GamepadEx(gamepad1);
         this.gamepad2 = new GamepadEx(gamepad2);
 
-        subsystems.addAll(List.of());
+        chassis = new Chassis(telemetry, hardwareMap);
+
+        subsystems.addAll(List.of(chassis));
 
         for(Subsystem s : subsystems) {
             register(s);
@@ -44,6 +51,23 @@ public class RobotContainer extends Robot {
         CommandScheduler.getInstance().reset();
         CommandScheduler.getInstance().cancelAll();
         CommandScheduler.getInstance().clearButtons();
+    }
+
+    public void autonomousInit() {
+        for(SubsystemIF s : subsystems) {
+            s.autonomousInit();
+        }
+    }
+    public void teleopInit() {
+        for(SubsystemIF s : subsystems) {
+            s.teleopInit();
+        }
+
+        chassis.setDefaultCommand(new TeleopDriveCommand(
+                chassis,
+                () -> gamepad1.getLeftY(),
+                () -> gamepad1.getLeftX(),
+                () -> gamepad1.getRightX()));
     }
 
     public void periodic() {

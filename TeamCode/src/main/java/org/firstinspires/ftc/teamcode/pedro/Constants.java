@@ -1,25 +1,39 @@
 package org.firstinspires.ftc.teamcode.pedro;
 
+import com.pedropathing.algorithm.Foresight;
 import com.pedropathing.algorithm.ForesightConfig;
 import com.pedropathing.controllers.Controller;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Matrix;
 import com.pedropathing.math.Pose;
 import com.pedropathing.math.Vector2D;
+import com.pedropathing.revhub.drivetrains.Mecanum;
 import com.pedropathing.revhub.drivetrains.MecanumConfig;
 import com.pedropathing.revhub.localizers.OTOSConfig;
+import com.pedropathing.revhub.localizers.OTOSLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
-    public static Follower create(HardwareMap h) {
-        // return new Follower(Drivetrain, Localizer, Foresight);
-        return null;
+    public static Follower createAutonomous(HardwareMap h) {
+        return new Follower(
+                new OTOSLocalizer(h,localizerConfig),
+                new Mecanum(h, autonomousConfig),
+                new Foresight(foresightConfig)
+        );
     }
 
-    public static MecanumConfig drivetrainConfig = new MecanumConfig(
+    public static Follower createTeleop(HardwareMap h) {
+        return new Follower(
+                new OTOSLocalizer(h,localizerConfig),
+                new Mecanum(h, teleOpConfig),
+                new Foresight(foresightConfig)
+        );
+    }
+
+    public static MecanumConfig autonomousConfig = new MecanumConfig(
             c -> {
         c.frontLeftName.set("front_left");
         c.frontRightName.set("front_right");
@@ -29,8 +43,21 @@ public class Constants {
         c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
         c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
         c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
-        c.manualBrakeMode.set(true);
+        c.manualBrakeMode.set(false);
     });
+
+    public static MecanumConfig teleOpConfig = new MecanumConfig(
+            c -> {
+                c.frontLeftName.set("front_left");
+                c.frontRightName.set("front_right");
+                c.backLeftName.set("back_left");
+                c.backRightName.set("back_right");
+                c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.manualBrakeMode.set(true);
+            });
 
     // TODO: actually come back and tune this
     // https://pedropathing.com/docs/pathing/tuning/localization/otos
