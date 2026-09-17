@@ -1,5 +1,34 @@
 package org.firstinspires.ftc.teamcode.pedro;
 
+import com.pedropathing.revhub.drivetrains.Mecanum;
+import com.pedropathing.revhub.localizers.OTOSLocalizer;
+import com.pedropathing.tuning.autotune.Procedure;
+import com.pedropathing.tuning.autotune.Tuner;
+
+import org.firstinspires.ftc.teamcode.pedro.procedures.ForesightTuner;
+import org.firstinspires.ftc.teamcode.pedro.procedures.MecanumTuner;
+import org.firstinspires.ftc.teamcode.pedro.procedures.OTOSTuner;
+import org.firstinspires.ftc.teamcode.pedro.procedures.Tests;
+
+
 public class Tuning {
-    // Tuners go here
+    @Tuner
+    public static Procedure mecanumTuner() {
+        return new MecanumTuner();
+    }
+
+    @Tuner
+    public static Procedure test() {
+        return new Tests(hardware -> new Mecanum(hardware, Constants.autonomousConfig), null, null);
+    }
+
+    @Tuner
+    public static Procedure otosTuner() {
+        return new OTOSTuner();
+    }
+
+    @Tuner
+    public static Procedure foresightTuner() {
+        return new ForesightTuner((hardwareMap) -> new OTOSLocalizer(hardwareMap, Constants.localizerConfig), (hardwareMap) -> new Mecanum(hardwareMap, Constants.autonomousConfig));
+    }
 }
