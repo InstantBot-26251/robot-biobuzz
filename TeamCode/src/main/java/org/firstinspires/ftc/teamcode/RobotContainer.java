@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -21,6 +22,8 @@ public class RobotContainer extends Robot {
     private final ElapsedTime timer = new ElapsedTime();
 
 
+    private final List<LynxModule> hubs;
+
     private final Chassis chassis;
 
     private HardwareMap hardwareMap;
@@ -36,6 +39,12 @@ public class RobotContainer extends Robot {
         this.telemetry = telemetry;
         this.gamepad1 = new GamepadEx(gamepad1);
         this.gamepad2 = new GamepadEx(gamepad2);
+
+
+        hubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : hubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
 
         chassis = new Chassis(telemetry, hardwareMap);
 
@@ -71,6 +80,10 @@ public class RobotContainer extends Robot {
     }
 
     public void periodic() {
+        for (LynxModule hub : hubs) {
+            hub.clearBulkCache();
+        }
+
         run();
 
         telemetry.addLine();
