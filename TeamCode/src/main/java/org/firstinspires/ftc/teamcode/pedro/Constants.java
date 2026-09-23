@@ -33,8 +33,7 @@ public class Constants {
         );
     }
 
-    public static MecanumConfig autonomousConfig = new MecanumConfig(
-            c -> {
+    public static MecanumConfig autonomousConfig = new MecanumConfig(c -> {
         c.frontLeftName.set("front_left");
         c.frontRightName.set("front_right");
         c.backLeftName.set("back_left");
@@ -46,18 +45,19 @@ public class Constants {
         c.manualBrakeMode.set(false);
     });
 
-    public static MecanumConfig teleOpConfig = new MecanumConfig(
-            c -> {
-                c.frontLeftName.set("front_left");
-                c.frontRightName.set("front_right");
-                c.backLeftName.set("back_left");
-                c.backRightName.set("back_right");
-                c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-                c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
-                c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-                c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
-                c.manualBrakeMode.set(true);
-            });
+    public static MecanumConfig teleOpConfig = new MecanumConfig(c -> {
+        c.frontLeftName.set("front_left");
+        c.frontRightName.set("front_right");
+        c.backLeftName.set("back_left");
+        c.backRightName.set("back_right");
+        c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+        c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
+        c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+        c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+        c.manualBrakeMode.set(true);
+    });
+
+
 
     // TODO: actually come back and tune this
     // https://pedropathing.com/docs/pathing/tuning/localization/otos
