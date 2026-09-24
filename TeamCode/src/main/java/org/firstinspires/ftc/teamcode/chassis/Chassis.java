@@ -28,7 +28,12 @@ public class Chassis extends SubsystemIF {
     @Override
     public void teleopInit() {
         follower = Constants.createTeleop(hardwareMap);
+        resetHeading();
     }
+
+    public void resetHeading() {
+            follower.setHeading(0);
+        }
 
     public void setDrivePowers(double fwd, double str, double rot) {
         DrivePowers powers = ManualDrive.fieldCentric(

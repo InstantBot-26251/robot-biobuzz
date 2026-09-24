@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.Robot;
 import com.seattlesolvers.solverslib.command.Subsystem;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
@@ -66,8 +67,10 @@ public class RobotContainer extends Robot {
         chassis.setDefaultCommand(new TeleopDriveCommand(
                 chassis,
                 () -> gamepad1.getLeftY(),
-                () -> gamepad1.getLeftX(),
-                () -> gamepad1.getRightX()));
+                () -> -gamepad1.getLeftX(),
+                () -> -gamepad1.getRightX()));
+        gamepad1.getGamepadButton(GamepadKeys.Button.START)
+                .whenPressed(chassis::resetHeading);
     }
 
     public void periodic() {
