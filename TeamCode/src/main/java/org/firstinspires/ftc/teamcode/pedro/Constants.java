@@ -59,13 +59,11 @@ public class Constants {
 
 
 
-    // TODO: actually come back and tune this
-    // https://pedropathing.com/docs/pathing/tuning/localization/otos
     public static OTOSConfig localizerConfig = new OTOSConfig(c -> {
         c.name.set("otos");
-        c.linearScalar.set(1.0);
-        c.linearScalar.set(1.0);
-        c.offset.set(new Pose(2,2));
+        c.linearScalar.set(249.69216);
+        c.angularScalar.set(0.9523809523809519);
+        c.offset.set(new Pose(-0.0, -0.0));
         c.linearUnit.set(DistanceUnit.INCH);
     });
 
