@@ -6,6 +6,7 @@ import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
@@ -49,6 +50,10 @@ public class Chassis extends SubsystemIF {
         follower.follow(path);
     }
 
+    public void setPose(Pose pose) {
+        follower.setPose(pose);
+    }
+
     public void stopFollower() {
         follower.stop();
     }
@@ -76,5 +81,8 @@ public class Chassis extends SubsystemIF {
     @Override
     public void periodic() {
         follower.update();
+
+        telemetry.addLine();
+        telemetry.addData("Is Following Path", isFollowingPath());
     }
 }

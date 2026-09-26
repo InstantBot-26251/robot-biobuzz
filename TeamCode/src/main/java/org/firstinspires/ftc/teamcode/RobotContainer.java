@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.Robot;
 import com.seattlesolvers.solverslib.command.Subsystem;
@@ -12,6 +15,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
+import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
 import org.firstinspires.ftc.teamcode.chassis.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 
@@ -80,6 +84,18 @@ public class RobotContainer extends Robot {
                 () -> -gamepad1.getRightX()));
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
+    }
+
+    public void setPose(Pose pose) {
+        chassis.setPose(pose);
+    }
+
+    public Command followPath(Path path) {
+        return ChassisCommands.createFollowPathCommand(chassis, path);
+    }
+
+    public Command followPath(Path path, boolean holdEnd) {
+        return ChassisCommands.createFollowPathCommand(chassis, path, holdEnd);
     }
 
     public void periodic() {
