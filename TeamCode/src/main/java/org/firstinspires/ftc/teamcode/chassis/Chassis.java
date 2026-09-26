@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.chassis;
 import com.pedropathing.drivetrain.DrivePowers;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -31,9 +33,38 @@ public class Chassis extends SubsystemIF {
         resetHeading();
     }
 
+    public Pose getPose() {
+        return follower.pose();
+    }
+
+    public boolean isFollowingPath() {
+        return follower.following();
+    }
+
+    public boolean isPathFinished() {
+        return !follower.isBusy() || !(isFollowingPath() || follower.holding());
+    }
+
+    public void followPath(Path path) {
+        follower.follow(path);
+    }
+
+    public void stopFollower() {
+        follower.stop();
+    }
+
+    public void setHoldEnd(boolean holdEnd) {
+        follower.holdEnd.set(holdEnd);
+
+    }
+
+    public void holdCurrentPose() {
+        follower.hold(getPose());
+    }
+
     public void resetHeading() {
             follower.setHeading(0);
-        }
+    }
 
     public void setDrivePowers(double fwd, double str, double rot) {
         DrivePowers powers = ManualDrive.fieldCentric(
