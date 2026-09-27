@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 
@@ -31,7 +32,11 @@ public class Chassis extends SubsystemIF {
     @Override
     public void teleopInit() {
         follower = Constants.createTeleop(hardwareMap);
-        resetHeading();
+        if (RobotContainer.ROBOT_POSE == null) {
+            setPose(Pose.zero());
+        } else {
+            setPose(RobotContainer.ROBOT_POSE);
+        }
     }
 
     public Pose getPose() {

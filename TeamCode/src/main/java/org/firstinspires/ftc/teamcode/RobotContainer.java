@@ -16,13 +16,15 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
-import org.firstinspires.ftc.teamcode.chassis.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RobotContainer extends Robot {
+    public static Pose ROBOT_POSE = null;
+
     private final List<SubsystemIF> subsystems = new ArrayList<>();
     private final ElapsedTime timer = new ElapsedTime();
 
@@ -77,13 +79,17 @@ public class RobotContainer extends Robot {
             s.teleopInit();
         }
 
-        chassis.setDefaultCommand(new TeleopDriveCommand(
+        chassis.setDefaultCommand(ChassisCommands.createTeleopDriveCommand(
                 chassis,
                 () -> gamepad1.getLeftY(),
                 () -> -gamepad1.getLeftX(),
                 () -> -gamepad1.getRightX()));
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
+    }
+
+    public void stop() {
+        ROBOT_POSE = chassis.getPose();
     }
 
     public void setPose(Pose pose) {

@@ -4,7 +4,18 @@ import com.pedropathing.paths.Path;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.FunctionalCommand;
 
+import java.util.function.DoubleSupplier;
+
 public class ChassisCommands {
+    public static Command createTeleopDriveCommand(Chassis chassis, DoubleSupplier fwd, DoubleSupplier str, DoubleSupplier rot) {
+        return chassis.runEnd(
+                () -> {
+                    chassis.setDrivePowers(fwd.getAsDouble(), str.getAsDouble(), rot.getAsDouble());
+                },
+                chassis::stopFollower
+        );
+    }
+
     public static Command createFollowPathCommand(Chassis chassis, Path path) {
         return createFollowPathCommand(chassis, path, true);
     }

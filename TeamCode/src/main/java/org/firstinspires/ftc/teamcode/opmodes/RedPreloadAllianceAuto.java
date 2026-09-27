@@ -44,4 +44,9 @@ public class RedPreloadAllianceAuto extends OpMode {
     public void loop() {
         robot.periodic();
     }
+
+    @Override
+    public void stop() {
+        robot.stop();
+    }
 }
