@@ -18,15 +18,15 @@ public class RedPreloadAllianceAuto extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
     private final Pose start = poseFactory.of(19.6947, 9.4014, 90);
-    private final Pose point1 = poseFactory.of(17.1866, 47.6246, 93.7542);
-    private final Pose point2 = poseFactory.of(24.7084, 93.838, 99.2445);
+    private final Pose point1 = poseFactory.of(17.1866, 47.6246, 90);
+    private final Pose point2 = poseFactory.of(24.7084, 93.838, -99.2445);
 
     public Path path1() {
         return line(start, point1).linear(start, point1);
     }
 
     public Path path2() {
-        return line(point1, point2).linear(point1, point2);
+        return line(point1, point2).reverseTangent();
     }
 
     @Override
