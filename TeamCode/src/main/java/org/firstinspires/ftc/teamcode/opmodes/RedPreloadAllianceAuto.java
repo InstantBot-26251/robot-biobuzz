@@ -15,13 +15,18 @@ import org.firstinspires.ftc.teamcode.RobotContainer;
 @Autonomous(name = "RedAlliancePreload")
 public class RedPreloadAllianceAuto extends OpMode {
     private RobotContainer robot;
-    private final PoseFactory p = PoseFactory.degrees();
+    private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose startPose = p.of(0, 0, 90);
-    private final Pose driveForwardPose = p.of(0, 48, 90);
+    private final Pose start = poseFactory.of(19.6947, 9.4014, 90);
+    private final Pose point1 = poseFactory.of(17.1866, 47.6246, 93.7542);
+    private final Pose point2 = poseFactory.of(24.7084, 93.838, 99.2445);
 
-    private Path driveForwardPath() {
-        return line(startPose, driveForwardPose).tangent();
+    public Path path1() {
+        return line(start, point1).linear(start, point1);
+    }
+
+    public Path path2() {
+        return line(point1, point2).linear(point1, point2);
     }
 
     @Override
@@ -29,14 +34,15 @@ public class RedPreloadAllianceAuto extends OpMode {
         robot = new RobotContainer(hardwareMap, telemetry, gamepad1, gamepad2);
         robot.autonomousInit();
 
-        robot.setPose(startPose);
+        robot.setPose(start);
     }
 
     @Override
     public void start() {
         CommandScheduler.getInstance().schedule(Commands.sequence(
-                robot.followPath(driveForwardPath()),
-                Commands.waitMillis(1000)
+                robot.followPath(path1()),
+                Commands.waitMillis(1000),
+                robot.followPath(path2())
         ));
     }
 
