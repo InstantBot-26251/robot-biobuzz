@@ -14,6 +14,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Intake.Intake;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
@@ -32,6 +33,8 @@ public class RobotContainer extends Robot {
     private final List<LynxModule> hubs;
 
     private final Chassis chassis;
+
+    private final Intake intake;
 
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
@@ -54,6 +57,8 @@ public class RobotContainer extends Robot {
         }
 
         chassis = new Chassis(telemetry, hardwareMap);
+
+        intake = new Intake(telemetry, hardwareMap);
 
         subsystems.addAll(List.of(chassis));
 
