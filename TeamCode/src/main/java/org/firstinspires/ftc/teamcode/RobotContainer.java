@@ -26,15 +26,10 @@ import java.util.List;
 
 public class RobotContainer extends Robot {
     public static Pose ROBOT_POSE = null;
-
     private final List<SubsystemIF> subsystems = new ArrayList<>();
     private final ElapsedTime timer = new ElapsedTime();
-
-
     private final List<LynxModule> hubs;
-
     private final Chassis chassis;
-
     private final Intake intake;
 
     private HardwareMap hardwareMap;
@@ -80,6 +75,7 @@ public class RobotContainer extends Robot {
             s.autonomousInit();
         }
     }
+
     public void teleopInit() {
         for(SubsystemIF s : subsystems) {
             s.teleopInit();
@@ -90,6 +86,7 @@ public class RobotContainer extends Robot {
                 () -> gamepad1.getLeftY(),
                 () -> -gamepad1.getLeftX(),
                 () -> -gamepad1.getRightX()));
+
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
 

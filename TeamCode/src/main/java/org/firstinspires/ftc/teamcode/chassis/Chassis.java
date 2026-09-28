@@ -37,6 +37,10 @@ public class Chassis extends SubsystemIF {
         }
     }
 
+    @Override
+    public void loop() {
+    }
+
     public Pose getPose() {
         return follower.pose();
     }
@@ -63,7 +67,6 @@ public class Chassis extends SubsystemIF {
 
     public void setHoldEnd(boolean holdEnd) {
         follower.holdEnd.set(holdEnd);
-
     }
 
     public void holdCurrentPose() {
@@ -79,7 +82,6 @@ public class Chassis extends SubsystemIF {
                 fwd, str, rot, follower.pose().heading());
         follower.manual(powers);
     }
-
 
     @Override
     public void periodic() {

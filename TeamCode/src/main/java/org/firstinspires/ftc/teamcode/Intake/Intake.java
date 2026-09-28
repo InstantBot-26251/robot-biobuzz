@@ -9,20 +9,16 @@ public class Intake extends SubsystemIF {
     private Telemetry telemetry;
     private HardwareMap hardwareMap;
 
-
     @Override
     public void autonomousInit() {
-
     }
 
     @Override
     public void teleopInit() {
-
     }
 
     @Override
     public void loop() {
-
     }
 
     public Intake(Telemetry telemetry, HardwareMap hardwareMap) {
