@@ -20,6 +20,11 @@ public class Intake extends SubsystemIF {
 
     }
 
+    @Override
+    public void loop() {
+
+    }
+
     public Intake(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;

@@ -15,6 +15,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Intake.IntakeCommands;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
@@ -91,6 +92,11 @@ public class RobotContainer extends Robot {
                 () -> -gamepad1.getRightX()));
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
+
+        intake.setDefaultCommand(IntakeCommands.intakeToggle(
+                intake,
+                () -> gamepad2.getButton(GamepadKeys.Button.RIGHT_BUMPER)
+        ));
     }
 
     public void stop() {
