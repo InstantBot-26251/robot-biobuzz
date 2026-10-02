@@ -8,6 +8,7 @@ public class IntakeCommands {
     public static Command intakeToggle(Intake intake, BooleanSupplier toggle) {
         return null;
     }
+
     public static Command intake(Intake intake) {
         return null;
     }
@@ -15,6 +16,7 @@ public class IntakeCommands {
     public static Command outtake(Intake intake) {
         return null;
     }
+
     public static Command stopIntake(Intake intake) {
         return null;
     }
