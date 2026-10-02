@@ -6,5 +6,4 @@ public abstract class SubsystemIF extends SubsystemBase {
     public abstract void autonomousInit();
     public abstract void teleopInit();
 
-    public abstract void loop();
 }

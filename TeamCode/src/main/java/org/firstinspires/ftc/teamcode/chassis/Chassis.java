@@ -37,10 +37,6 @@ public class Chassis extends SubsystemIF {
         }
     }
 
-    @Override
-    public void loop() {
-    }
-
     public Pose getPose() {
         return follower.pose();
     }
