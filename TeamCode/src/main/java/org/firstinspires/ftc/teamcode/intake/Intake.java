@@ -9,20 +9,28 @@ import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 public class Intake extends SubsystemIF {
     private Telemetry telemetry;
     private HardwareMap hardwareMap;
-    private DcMotorEx motor;
+    private DcMotorEx intakeMotor;
 
     public Intake(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
-        this.motor = hardwareMap.get(DcMotorEx.class, "intake");
+        this.intakeMotor = hardwareMap.get(DcMotorEx.class, "intake");
     }
 
-    public void setPower(double power) {
-        motor.setPower(power);
+    public void intake() {
+        setPower(1.0);
+    }
+
+    public void outtake() {
+        setPower(-1.0);
     }
 
     public void stop() {
-        motor.setPower(0);
+        setPower(0);
+    }
+
+    private void setPower(double power) {
+        intakeMotor.setPower(power);
     }
 
     @Override

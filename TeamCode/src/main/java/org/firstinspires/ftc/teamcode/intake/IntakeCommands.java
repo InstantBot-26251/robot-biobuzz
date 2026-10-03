@@ -5,11 +5,11 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 
 public class IntakeCommands {
     public static Command intake(Intake intake) {
-        return new InstantCommand(() -> intake.setPower(1.0), intake);
+        return new InstantCommand(intake::intake, intake);
     }
 
     public static Command outtake(Intake intake) {
-        return new InstantCommand(() -> intake.setPower(-1.0), intake);
+        return new InstantCommand(intake::outtake, intake);
     }
 
     public static Command stopIntake(Intake intake) {
