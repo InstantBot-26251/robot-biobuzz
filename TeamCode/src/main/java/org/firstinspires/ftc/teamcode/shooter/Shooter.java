@@ -16,15 +16,15 @@ public class Shooter extends SubsystemIF {
     private Telemetry telemetry;
     private HardwareMap hardwareMap;
     private double power;
-    DcMotorSimple shooterMotor;
-    Servo doorServo;
+    private DcMotorSimple shooterMotor;
+    private Servo intakeServo;
 
     public Shooter(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
 
         shooterMotor = hardwareMap.get(DcMotorSimple.class, "shooterMotor");
-        doorServo = hardwareMap.get(Servo.class, "shooterServo");
+        intakeServo = hardwareMap.get(Servo.class, "shooterServo");
     }
 
     @Override
@@ -45,11 +45,11 @@ public class Shooter extends SubsystemIF {
 
 
     public void openDoor() {
-        doorServo.setPosition(DOOR_OPEN_POSITION);
+        intakeServo.setPosition(DOOR_OPEN_POSITION);
     }
 
     public void closeDoor() {
-        doorServo.setPosition(DOOR_CLOSED_POSITION);
+        intakeServo.setPosition(DOOR_CLOSED_POSITION);
     }
 
     public void spinUpFlywheel() {
