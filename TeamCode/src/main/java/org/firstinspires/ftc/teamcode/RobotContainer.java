@@ -88,11 +88,9 @@ public class RobotContainer extends Robot {
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
 
-        gamepad2.getGamepadButton(GamepadKeys.Button.A).whenPressed(ShooterCommands.shoot(shooter));
-        gamepad2.getGamepadButton(GamepadKeys.Button.B).whenPressed(ShooterCommands.stop(shooter));
-        gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.increaseShotPower(shooter));
-        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenPressed(ShooterCommands.decreaseShotPower(shooter));
-        gamepad2.getGamepadButton(GamepadKeys.Button.X).whenPressed(ShooterCommands.resetShot(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.A).whenPressed(ShooterCommands.enableShooter(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.B).whenPressed(ShooterCommands.disableShooter(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.shoot(shooter));
     }
 
     public void stop() {
