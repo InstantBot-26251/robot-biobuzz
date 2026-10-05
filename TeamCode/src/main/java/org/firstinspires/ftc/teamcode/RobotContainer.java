@@ -18,6 +18,8 @@ import org.firstinspires.ftc.teamcode.intake.Intake;
 import org.firstinspires.ftc.teamcode.intake.IntakeCommands;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
+import org.firstinspires.ftc.teamcode.shooter.Shooter;
+import org.firstinspires.ftc.teamcode.shooter.ShooterCommands;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 
 
@@ -30,6 +32,7 @@ public class RobotContainer extends Robot {
     private final ElapsedTime timer = new ElapsedTime();
     private final List<LynxModule> hubs;
     private final Chassis chassis;
+    private final Shooter shooter;
     private final Intake intake;
 
     private HardwareMap hardwareMap;
@@ -53,9 +56,10 @@ public class RobotContainer extends Robot {
         }
 
         chassis = new Chassis(telemetry, hardwareMap);
+        shooter = new Shooter(telemetry, hardwareMap);
         intake = new Intake(telemetry, hardwareMap);
 
-        subsystems.addAll(List.of(chassis, intake));
+        subsystems.addAll(List.of(chassis, intake, shooter));
 
         for(Subsystem s : subsystems) {
             register(s);
@@ -89,6 +93,9 @@ public class RobotContainer extends Robot {
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
 
+        gamepad2.getGamepadButton(GamepadKeys.Button.A).whenPressed(ShooterCommands.enableShooter(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.B).whenPressed(ShooterCommands.disableShooter(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.shoot(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(IntakeCommands.intake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
