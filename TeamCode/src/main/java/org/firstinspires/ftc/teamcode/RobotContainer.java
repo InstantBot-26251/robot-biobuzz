@@ -57,11 +57,9 @@ public class RobotContainer extends Robot {
 
         chassis = new Chassis(telemetry, hardwareMap);
         shooter = new Shooter(telemetry, hardwareMap);
-
-        subsystems.addAll(List.of(chassis, shooter));
         intake = new Intake(telemetry, hardwareMap);
 
-        subsystems.addAll(List.of(chassis, intake));
+        subsystems.addAll(List.of(chassis, intake, shooter));
 
         for(Subsystem s : subsystems) {
             register(s);
