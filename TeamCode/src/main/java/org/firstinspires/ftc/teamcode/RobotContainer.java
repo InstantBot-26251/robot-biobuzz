@@ -14,6 +14,8 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.intake.Intake;
+import org.firstinspires.ftc.teamcode.intake.IntakeCommands;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
@@ -26,12 +28,12 @@ import java.util.List;
 
 public class RobotContainer extends Robot {
     public static Pose ROBOT_POSE = null;
-
     private final List<SubsystemIF> subsystems = new ArrayList<>();
     private final ElapsedTime timer = new ElapsedTime();
     private final List<LynxModule> hubs;
     private final Chassis chassis;
     private final Shooter shooter;
+    private final Intake intake;
 
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
@@ -57,6 +59,9 @@ public class RobotContainer extends Robot {
         shooter = new Shooter(telemetry, hardwareMap);
 
         subsystems.addAll(List.of(chassis, shooter));
+        intake = new Intake(telemetry, hardwareMap);
+
+        subsystems.addAll(List.of(chassis, intake));
 
         for(Subsystem s : subsystems) {
             register(s);
@@ -75,6 +80,7 @@ public class RobotContainer extends Robot {
             s.autonomousInit();
         }
     }
+
     public void teleopInit() {
         for(SubsystemIF s : subsystems) {
             s.teleopInit();
@@ -85,12 +91,19 @@ public class RobotContainer extends Robot {
                 () -> gamepad1.getLeftY(),
                 () -> -gamepad1.getLeftX(),
                 () -> -gamepad1.getRightX()));
+
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
 
         gamepad2.getGamepadButton(GamepadKeys.Button.A).whenPressed(ShooterCommands.enableShooter(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.B).whenPressed(ShooterCommands.disableShooter(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.shoot(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(IntakeCommands.intake(intake))
+                .whenReleased(IntakeCommands.stopIntake(intake));
+        gamepad2.getGamepadButton(GamepadKeys.Button.B)
+                .whenPressed(IntakeCommands.outtake(intake))
+                .whenReleased(IntakeCommands.stopIntake(intake));
     }
 
     public void stop() {

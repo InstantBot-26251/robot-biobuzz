@@ -6,8 +6,6 @@ import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.seattlesolvers.solverslib.command.Command;
-import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
@@ -65,7 +63,6 @@ public class Chassis extends SubsystemIF {
 
     public void setHoldEnd(boolean holdEnd) {
         follower.holdEnd.set(holdEnd);
-
     }
 
     public void holdCurrentPose() {
@@ -81,7 +78,6 @@ public class Chassis extends SubsystemIF {
                 fwd, str, rot, follower.pose().heading());
         follower.manual(powers);
     }
-
 
     @Override
     public void periodic() {
