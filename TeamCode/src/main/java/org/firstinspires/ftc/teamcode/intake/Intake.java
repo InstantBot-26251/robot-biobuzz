@@ -33,6 +33,10 @@ public class Intake extends SubsystemIF {
         setPower(0);
     }
 
+    public void noIntake() {
+        setPower(-.25);
+    }
+
     private void setPower(double power) {
         motorPower = power;
     }
