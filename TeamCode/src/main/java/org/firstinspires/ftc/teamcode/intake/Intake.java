@@ -21,6 +21,14 @@ public class Intake extends SubsystemIF {
         this.intakeMotor = hardwareMap.get(DcMotorEx.class, "intake");
     }
 
+    @Override
+    public void autonomousInit() {
+    }
+
+    @Override
+    public void teleopInit() {
+    }
+
     public void intake() {
         setPower(1.0);
     }
@@ -39,14 +47,6 @@ public class Intake extends SubsystemIF {
 
     private void setPower(double power) {
         motorPower = power;
-    }
-
-    @Override
-    public void autonomousInit() {
-    }
-
-    @Override
-    public void teleopInit() {
     }
 
     @Override
