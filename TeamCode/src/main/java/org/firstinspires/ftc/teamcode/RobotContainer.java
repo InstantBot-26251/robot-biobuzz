@@ -93,6 +93,7 @@ public class RobotContainer extends Robot {
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
 
+        //for the shooters, the trigger buttons should shoot.
         gamepad2.getGamepadButton(GamepadKeys.Button.A).whenPressed(ShooterCommands.enableShooter(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.Y).whenPressed(ShooterCommands.disableShooter(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.shoot(shooter));
