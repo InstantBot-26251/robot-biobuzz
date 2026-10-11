@@ -13,8 +13,7 @@ public class ShooterCommands {
         return new InstantCommand(shooter::stopShooter, shooter);
     }
 
-
     public static Command shoot(Shooter shooter) {
-        return Commands.none();
+        return new InstantCommand(shooter::shoot);
     }
 }
