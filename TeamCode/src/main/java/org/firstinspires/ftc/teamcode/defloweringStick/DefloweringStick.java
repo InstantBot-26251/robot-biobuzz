@@ -27,7 +27,7 @@ public class DefloweringStick extends SubsystemIF {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
 
-        this.defloweringServo = hardwareMap.get(Servo.class, "i");
+        this.defloweringServo = hardwareMap.get(Servo.class, "defloweringStick");
     }
 
     @Override
@@ -57,14 +57,7 @@ public class DefloweringStick extends SubsystemIF {
 
     @Override
     public void periodic() {
-        telemetry.addData("Deflowering Angle", defloweringAngle);
-        telemetry.addData("Deflowering Servo Position", defloweringServo);
-
-        if(gamepad2.x) {
-            deflower();
-        } else {
-            restDeflowerer();
-        }
-
+        telemetry.addData("Deflowering Angle ", defloweringAngle);
+        telemetry.addData("Deflowering Servo Position ", defloweringServo);
     }
 }
