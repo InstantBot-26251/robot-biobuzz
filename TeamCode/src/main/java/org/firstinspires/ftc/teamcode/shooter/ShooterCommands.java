@@ -5,6 +5,7 @@ import com.seattlesolvers.solverslib.command.Commands;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 
+import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
 public class ShooterCommands {
     public static Command enableShooter(Shooter shooter) {
         return new InstantCommand(shooter::enableShooter, shooter);
@@ -15,8 +16,10 @@ public class ShooterCommands {
     }
 
     public static Command shoot(Shooter shooter) {
-       return new InstantCommand(shooter::enableShooter).andThen(new WaitCommand(1000))
-               .andThen(new InstantCommand(shooter::startUpServos)).andThen(new WaitCommand(500))
-               .andThen(new InstantCommand(shooter::stopShooter));
+      return Commands.sequence(new InstantCommand(shooter::enableShooter),
+               (new WaitCommand(SERVO_WAIT_TIME)),
+               (new InstantCommand(shooter::startUpServos)),
+               (new WaitCommand(POST_CYCLE_WAIT_TIME)),
+               (new InstantCommand(shooter::stopShooter)));
     }
 }

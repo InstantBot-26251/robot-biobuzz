@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -47,12 +48,16 @@ public class Shooter extends SubsystemIF {
 
     public void setUpMotors() {
         rightShooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightShooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftShooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightShooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftShooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightShooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftShooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void setUpServos() {
         rightIntakeServo.setDirection(Servo.Direction.FORWARD);
-        rightIntakeServo.setDirection(Servo.Direction.REVERSE);
+        leftIntakeServo.setDirection(Servo.Direction.REVERSE);
     }
 
     public void enableShooter() {
@@ -60,14 +65,14 @@ public class Shooter extends SubsystemIF {
     }
 
     public void startUpServos() {
-        servoPosition = SERVO_POWER;
         rightIntakeServo.setPosition(servoPosition);
         leftIntakeServo.setPosition(servoPosition);
     }
 
     public void stopShooter() {
         motorPower = 0;
-        servoPosition = 0;
+        rightIntakeServo.setPosition(0);
+        leftIntakeServo.setPosition(0);
     }
 
     @Override
