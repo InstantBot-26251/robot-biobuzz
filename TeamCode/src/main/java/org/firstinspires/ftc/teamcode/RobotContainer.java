@@ -14,6 +14,8 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.defloweringStick.DefloweringStick;
+import org.firstinspires.ftc.teamcode.defloweringStick.DefloweringStickCommands;
 import org.firstinspires.ftc.teamcode.intake.Intake;
 import org.firstinspires.ftc.teamcode.intake.IntakeCommands;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
@@ -34,6 +36,8 @@ public class RobotContainer extends Robot {
     private final Chassis chassis;
     private final Shooter shooter;
     private final Intake intake;
+
+    private final DefloweringStick defloweringStick;
 
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
@@ -58,6 +62,7 @@ public class RobotContainer extends Robot {
         chassis = new Chassis(telemetry, hardwareMap);
         shooter = new Shooter(telemetry, hardwareMap);
         intake = new Intake(telemetry, hardwareMap);
+        defloweringStick = new DefloweringStick(telemetry, hardwareMap);
 
         subsystems.addAll(List.of(chassis, intake, shooter));
 
@@ -100,6 +105,8 @@ public class RobotContainer extends Robot {
         gamepad2.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(IntakeCommands.intake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
+        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenPressed(DefloweringStickCommands
+                .deflower(defloweringStick)).whenReleased(DefloweringStickCommands.restDeflowering(defloweringStick));
         gamepad2.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(IntakeCommands.outtake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
