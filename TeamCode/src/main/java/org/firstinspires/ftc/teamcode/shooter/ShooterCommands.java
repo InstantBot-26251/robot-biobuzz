@@ -3,9 +3,10 @@ package org.firstinspires.ftc.teamcode.shooter;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.Commands;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.WaitCommand;
-
 import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
+
+
+
 public class ShooterCommands {
     public static Command enableShooter(Shooter shooter) {
         return new InstantCommand(shooter::enableShooter, shooter);

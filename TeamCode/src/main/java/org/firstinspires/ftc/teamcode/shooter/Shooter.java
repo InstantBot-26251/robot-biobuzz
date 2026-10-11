@@ -85,5 +85,7 @@ public class Shooter extends SubsystemIF {
         leftShooterMotor.setPower(motorPower);
         telemetry.addData("Shooter Motor Power", motorPower);
         telemetry.addData("Servo Position", servoPosition);
+        telemetry.addData("Servo Wait Time", SERVO_WAIT_TIME);
+        telemetry.addData("Post cycle wait time", POST_CYCLE_WAIT_TIME);
     }
 }

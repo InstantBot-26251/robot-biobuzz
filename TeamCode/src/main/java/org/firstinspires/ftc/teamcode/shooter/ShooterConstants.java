@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.FtcDashboard;
+
+@Config
 public class ShooterConstants {
 
     public static final double SHOOTER_POWER = 0.5; // TODO: tune on robot
