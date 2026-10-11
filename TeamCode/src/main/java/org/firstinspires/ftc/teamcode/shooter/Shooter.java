@@ -13,7 +13,6 @@ import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
 
 public class Shooter extends SubsystemIF {
 
-
     private Telemetry telemetry;
     private HardwareMap hardwareMap;
     private double motorPower;
@@ -47,10 +46,15 @@ public class Shooter extends SubsystemIF {
     }
 
     public void setUpMotors() {
-        rightShooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftShooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightShooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        leftShooterMotor.setDirection(DcMotorEx.Direction.REVERSE);
+
         rightShooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftShooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rightShooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftShooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         rightShooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftShooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
@@ -71,8 +75,8 @@ public class Shooter extends SubsystemIF {
 
     public void stopShooter() {
         motorPower = 0;
-        rightIntakeServo.setPosition(0);
-        leftIntakeServo.setPosition(0);
+        rightIntakeServo.setPosition(SERVO_REST_POSITION);
+        leftIntakeServo.setPosition(SERVO_REST_POSITION);
     }
 
     @Override
