@@ -41,15 +41,15 @@ public class Intake extends SubsystemIF {
     }
 
     public void intake() {
-        setPower(IntakeConstants.intakePower);
+        setPower(IntakeConstants.INTAKE_POWER);
     }
 
     public void outtake() {
-        setPower(IntakeConstants.outtakePower);
+        setPower(IntakeConstants.OUTTAKE_POWER);
     }
 
     public void stop() {
-        setPower(IntakeConstants.stopIntakePower);
+        setPower(IntakeConstants.STOP_INTAKE_POWER);
     }
 
     private void setPower(double power) {
