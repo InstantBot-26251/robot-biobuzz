@@ -23,13 +23,6 @@ public class Intake extends SubsystemIF {
         this.intakeMotor = hardwareMap.get(DcMotorEx.class, "intake");
     }
 
-    public void setupMotors() {
-        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        intakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
     @Override
     public void autonomousInit() {
         setupMotors();
@@ -40,20 +33,23 @@ public class Intake extends SubsystemIF {
         setupMotors();
     }
 
+    public void setupMotors() {
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
     public void intake() {
-        setPower(1.0);
+        setPower(IntakeConstants.intakePower);
     }
 
     public void outtake() {
-        setPower(-1.0);
+        setPower(IntakeConstants.outtakePower);
     }
 
     public void stop() {
-        setPower(0);
-    }
-
-    public void noIntake() {
-        setPower(-.25);
+        setPower(IntakeConstants.stopIntakePower);
     }
 
     private void setPower(double power) {

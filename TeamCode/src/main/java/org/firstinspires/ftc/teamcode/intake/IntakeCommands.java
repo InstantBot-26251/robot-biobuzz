@@ -12,10 +12,6 @@ public class IntakeCommands {
         return new InstantCommand(intake::outtake, intake);
     }
 
-    public static Command noIntake(Intake intake) {
-        return new InstantCommand(intake::noIntake, intake);
-    }
-
     public static Command stopIntake(Intake intake) {
         return new InstantCommand(intake::stop, intake);
     }

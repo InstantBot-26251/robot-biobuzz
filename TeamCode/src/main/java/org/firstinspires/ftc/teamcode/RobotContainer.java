@@ -99,12 +99,10 @@ public class RobotContainer extends Robot {
         gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.shoot(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(IntakeCommands.intake(intake))
-                .whenReleased(IntakeCommands.noIntake(intake));
+                .whenReleased(IntakeCommands.stopIntake(intake));
         gamepad2.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(IntakeCommands.outtake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
-        gamepad2.getGamepadButton(GamepadKeys.Button.A)
-                .whenPressed(IntakeCommands.stopIntake(intake));
     }
 
     public void stop() {
