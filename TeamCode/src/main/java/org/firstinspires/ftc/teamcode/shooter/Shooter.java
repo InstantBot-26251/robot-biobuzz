@@ -16,7 +16,6 @@ public class Shooter extends SubsystemIF {
     private Telemetry telemetry;
     private HardwareMap hardwareMap;
     private double motorPower;
-    private double servoPosition;
     private DcMotorEx rightShooterMotor;
     private DcMotorEx leftShooterMotor;
     private Servo rightIntakeServo;
