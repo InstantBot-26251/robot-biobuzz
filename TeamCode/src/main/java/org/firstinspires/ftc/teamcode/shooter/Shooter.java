@@ -68,8 +68,8 @@ public class Shooter extends SubsystemIF {
     }
 
     public void startUpServos() {
-        rightIntakeServo.setPosition(servoPosition);
-        leftIntakeServo.setPosition(servoPosition);
+        rightIntakeServo.setPosition(SERVO_POSITION);
+        leftIntakeServo.setPosition(SERVO_POSITION);
     }
 
     public void stopShooter() {
