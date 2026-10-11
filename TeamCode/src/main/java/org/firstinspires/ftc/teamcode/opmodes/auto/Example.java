@@ -8,7 +8,7 @@ import com.seattlesolvers.solverslib.command.Commands;
 
 import org.firstinspires.ftc.teamcode.util.AutoFactory;
 
-public class example extends AutoFactory {
+public class Example extends AutoFactory {
     private final Pose path1 = poseFactory.of(85.6805, 109.4573, 270);
 
     @Override
