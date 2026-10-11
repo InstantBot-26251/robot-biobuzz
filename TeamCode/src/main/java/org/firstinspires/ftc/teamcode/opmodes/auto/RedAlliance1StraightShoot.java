@@ -5,13 +5,14 @@ import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.Commands;
 
 import org.firstinspires.ftc.teamcode.RobotContainer;
 
 @Autonomous(name = "Red Alliance Straight Shoot-C,1")
-public class RedAlliance1StraightShoot {
+public class RedAlliance1StraightShoot extends OpMode {
     private RobotContainer robot;
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
