@@ -29,7 +29,6 @@ public class BlueAlliance1StraightShoot extends OpMode {
     public void init() {
         robot = new RobotContainer(hardwareMap, telemetry, gamepad1, gamepad2);
         robot.autonomousInit();
-
         robot.setPose(start);
     }
 
