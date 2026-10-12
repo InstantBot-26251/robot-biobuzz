@@ -73,8 +73,8 @@ public class Shooter extends SubsystemIF {
 
     public void stopShooter() {
         motorPower = 0;
-        rightIntakeServo.setPower(SERVO_REST_POSITION);
-        leftIntakeServo.setPower(SERVO_REST_POSITION);
+        rightIntakeServo.setPower(0);
+        leftIntakeServo.setPower(0);
     }
 
     @Override
