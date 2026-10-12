@@ -1,10 +1,14 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
+
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.Commands;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 
+
 import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
+
+
 
 
 public class ShooterCommands {
@@ -12,15 +16,20 @@ public class ShooterCommands {
         return Commands.runOnce(shooter::enableShooter, shooter);
     }
 
+
     public static Command disableShooter(Shooter shooter) {
         return Commands.runOnce(shooter::stopShooter, shooter);
     }
 
+
+    public static Command disableShooterServo(Shooter shooter) {
+        return Commands.runOnce(shooter::stopServos, shooter);
+    }
+
+
     public static Command shoot(Shooter shooter) {
         return Commands.sequence(Commands.runOnce(shooter::enableShooter, shooter),
                 Commands.waitMillis(SERVO_WAIT_TIME),
-                Commands.runOnce(shooter::startUpServos, shooter),
-                Commands.waitMillis(POST_CYCLE_WAIT_TIME),
-                Commands.runOnce(shooter::stopShooter, shooter));
+                Commands.runOnce(shooter::startUpServos, shooter));
     }
 }
