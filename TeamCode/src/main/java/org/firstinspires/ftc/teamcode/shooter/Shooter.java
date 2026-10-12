@@ -5,22 +5,20 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
-
 public class Shooter extends SubsystemIF {
 
     private final Telemetry telemetry;
     private final  HardwareMap hardwareMap;
-    private double motorPower;
     private DcMotorEx rightShooterMotor;
     private DcMotorEx leftShooterMotor;
     private CRServo rightIntakeServo;
     private CRServo leftIntakeServo;
+    private double motorPower;
 
     public Shooter(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;

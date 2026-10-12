@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.FtcDashboard;
-
 @Config
 public class ShooterConstants {
 
