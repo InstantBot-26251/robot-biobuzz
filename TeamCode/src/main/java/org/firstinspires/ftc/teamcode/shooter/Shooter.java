@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -13,13 +14,13 @@ import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
 
 public class Shooter extends SubsystemIF {
 
-    private Telemetry telemetry;
-    private HardwareMap hardwareMap;
+    private final Telemetry telemetry;
+    private final  HardwareMap hardwareMap;
     private double motorPower;
     private DcMotorEx rightShooterMotor;
     private DcMotorEx leftShooterMotor;
-    private Servo rightIntakeServo;
-    private Servo leftIntakeServo;
+    private CRServo rightIntakeServo;
+    private CRServo leftIntakeServo;
 
     public Shooter(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
@@ -28,8 +29,8 @@ public class Shooter extends SubsystemIF {
 
         rightShooterMotor = hardwareMap.get(DcMotorEx.class, "rightShooterMotor");
         leftShooterMotor = hardwareMap.get(DcMotorEx.class, "leftShooterMotor");
-        rightIntakeServo = hardwareMap.get(Servo.class, "rightShooterServo");
-        leftIntakeServo = hardwareMap.get(Servo.class, "leftShooterServo");
+        rightIntakeServo = hardwareMap.get(CRServo.class, "rightShooterServo");
+        leftIntakeServo = hardwareMap.get(CRServo.class, "leftShooterServo");
     }
 
     @Override
@@ -59,8 +60,8 @@ public class Shooter extends SubsystemIF {
     }
 
     public void setUpServos() {
-        rightIntakeServo.setDirection(Servo.Direction.FORWARD);
-        leftIntakeServo.setDirection(Servo.Direction.REVERSE);
+        rightIntakeServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftIntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void enableShooter() {
@@ -68,14 +69,14 @@ public class Shooter extends SubsystemIF {
     }
 
     public void startUpServos() {
-        rightIntakeServo.setPosition(SERVO_POSITION);
-        leftIntakeServo.setPosition(SERVO_POSITION);
+        rightIntakeServo.setPower(SERVO_POWER);
+        leftIntakeServo.setPower(SERVO_POWER);
     }
 
     public void stopShooter() {
         motorPower = 0;
-        rightIntakeServo.setPosition(SERVO_REST_POSITION);
-        leftIntakeServo.setPosition(SERVO_REST_POSITION);
+        rightIntakeServo.setPower(SERVO_REST_POSITION);
+        leftIntakeServo.setPower(SERVO_REST_POSITION);
     }
 
     @Override
@@ -83,8 +84,5 @@ public class Shooter extends SubsystemIF {
         rightShooterMotor.setPower(motorPower);
         leftShooterMotor.setPower(motorPower);
         telemetry.addData("Shooter Motor Power", motorPower);
-        telemetry.addData("Servo Position", SERVO_POSITION);
-        telemetry.addData("Servo Wait Time", SERVO_WAIT_TIME);
-        telemetry.addData("Post cycle wait time", POST_CYCLE_WAIT_TIME);
     }
 }
