@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.shooter.ShooterCommands;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
+import org.firstinspires.ftc.teamcode.vision.Vision;
 
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class RobotContainer extends Robot {
     private final Intake intake;
 
     private final DefloweringStick defloweringStick;
+    private final Vision vision;
 
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
@@ -63,8 +65,9 @@ public class RobotContainer extends Robot {
         shooter = new Shooter(telemetry, hardwareMap);
         intake = new Intake(telemetry, hardwareMap);
         defloweringStick = new DefloweringStick(telemetry, hardwareMap);
+        vision = new Vision(telemetry, hardwareMap);
 
-        subsystems.addAll(List.of(chassis, intake, shooter));
+        subsystems.addAll(List.of(chassis, intake, shooter, vision));
 
         for(Subsystem s : subsystems) {
             register(s);
@@ -82,6 +85,8 @@ public class RobotContainer extends Robot {
         for(SubsystemIF s : subsystems) {
             s.autonomousInit();
         }
+
+        shooter.setDefaultCommand(ShooterCommands.autoAim(shooter, vision));
     }
 
     public void teleopInit() {
@@ -97,6 +102,8 @@ public class RobotContainer extends Robot {
 
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
+
+        shooter.setDefaultCommand(ShooterCommands.autoAim(shooter, vision));
 
         //for the shooters, the trigger buttons should shoot.
         gamepad2.getGamepadButton(GamepadKeys.Button.A).whenPressed(ShooterCommands.enableShooter(shooter));

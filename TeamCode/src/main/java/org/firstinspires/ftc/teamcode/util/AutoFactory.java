@@ -13,17 +13,25 @@ public abstract class AutoFactory extends OpMode {
     protected Pose startPose;
     protected RobotContainer robot;
 
+    protected abstract Alliance getAlliance();
     protected abstract Pose setStartPose();
     protected abstract Command createAutoSequence();
 
     @Override
     public void init() {
+        Alliance.setCurrent(getAlliance());
         startPose = setStartPose();
 
         robot = new RobotContainer(hardwareMap, telemetry, gamepad1, gamepad2);
         robot.autonomousInit();
 
         robot.setPose(startPose);
+    }
+
+    @Override
+    public void init_loop() {
+        telemetry.addData("Alliance", Alliance.getCurrent());
+        telemetry.update();
     }
 
     @Override
