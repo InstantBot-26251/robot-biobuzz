@@ -15,7 +15,7 @@ public class RedAlliance1StraightShoot extends AutoFactory {
 
     @Override
     protected Pose setStartPose() {
-        return poseFactory.of(55.842, 9.0242, 90);
+        return poseFactory.of(55.8195, 9.0242, 90);
     }
 
     private Path path1() {
