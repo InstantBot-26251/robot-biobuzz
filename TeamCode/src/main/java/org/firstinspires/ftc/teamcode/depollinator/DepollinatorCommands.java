@@ -1,0 +1,14 @@
+package org.firstinspires.ftc.teamcode.depollinator;
+
+import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.InstantCommand;
+
+public class DepollinatorCommands {
+    public static Command depollinate(Depollinator depollinator) {
+        return new InstantCommand(depollinator::depollinate, depollinator);
+    }
+
+    public static Command restDepollinator(Depollinator depollinator) {
+        return new InstantCommand(depollinator::restDepollinator, depollinator);
+    }
+}
