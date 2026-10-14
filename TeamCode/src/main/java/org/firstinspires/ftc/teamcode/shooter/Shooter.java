@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.seattlesolvers.solverslib.controller.PIDFController;
 
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -22,13 +23,13 @@ public class Shooter extends SubsystemIF {
     private DcMotorEx leftShooterMotor;
     private CRServo rightIntakeServo;
     private CRServo leftIntakeServo;
-    private double motorPower;
+    private final PIDFController shooterPID;
 
 
     public Shooter(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
-        motorPower = 0;
+        shooterPID = new PIDFController(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F);
 
 
         rightShooterMotor = hardwareMap.get(DcMotorEx.class, "rightShooterMotor");
@@ -77,7 +78,7 @@ public class Shooter extends SubsystemIF {
 
 
     public void enableShooter() {
-        motorPower = SHOOTER_POWER;
+        shooterPID.setSetPoint(toTicksPerSec(SHOOTER_VELOCITY));
     }
 
 
@@ -88,7 +89,7 @@ public class Shooter extends SubsystemIF {
 
 
     public void stopShooter() {
-        motorPower = 0;
+        shooterPID.setSetPoint(0);
         rightIntakeServo.setPower(0);
         leftIntakeServo.setPower(0);
     }
@@ -98,10 +99,29 @@ public class Shooter extends SubsystemIF {
     }
 
 
+    public double getShooterVelocity() {
+        return rightShooterMotor.getVelocity();
+    }
+
+
     @Override
     public void periodic() {
-        rightShooterMotor.setPower(motorPower);
-        leftShooterMotor.setPower(motorPower);
-        telemetry.addData("Shooter Motor Power ", motorPower);
+        shooterPID.setPIDF(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F); // TODO: delete once the PID is tuned
+
+        double velocity = getShooterVelocity();
+        double output = 0;
+
+        if (shooterPID.getSetPoint() == 0) {
+            rightShooterMotor.setPower(0);
+            leftShooterMotor.setPower(0);
+        } else {
+            output = shooterPID.calculate(velocity) / toTicksPerSec(MAX_ACHIEVABLE_RPM);
+            rightShooterMotor.setPower(output);
+            leftShooterMotor.setPower(output);
+        }
+
+        telemetry.addData("Shooter Target Velocity", shooterPID.getSetPoint());
+        telemetry.addData("Shooter Velocity", velocity);
+        telemetry.addData("Shooter PID Output", output);
     }
 }
