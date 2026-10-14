@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class ShooterConstants {
 
 
-    public static double SHOOTER_VELOCITY = 1500;
+    public static double SHOOTER_VELOCITY = 1500; // ticks per second. TODO: tune on robot
 
     public static double SHOOTER_P = 1;
     public static double SHOOTER_I = 0;
@@ -17,4 +17,3 @@ public class ShooterConstants {
     public static long SERVO_WAIT_TIME = 10;
     public static long POST_CYCLE_WAIT_TIME = 50;
 }
-
