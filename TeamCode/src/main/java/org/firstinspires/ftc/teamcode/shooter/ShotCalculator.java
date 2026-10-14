@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
-import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
+import static org.firstinspires.ftc.teamcode.vision.VisionConstants.*;
 
 public final class ShotCalculator {
     public static final double GRAVITY_IN_PER_S2 = 386.09;
@@ -28,13 +28,10 @@ public final class ShotCalculator {
         return CAL_POWER * (needed / atCalibration) * trim;
     }
 
-    public static double motorPower(double distanceIn, double batteryVoltage) {
+    public static double motorPower(double distanceIn) {
         double power = powerForDistance(distanceIn);
         if (Double.isNaN(power)) {
             return Double.NaN;
-        }
-        if (VOLTAGE_COMPENSATION && batteryVoltage > 6.0) {
-            power *= NOMINAL_VOLTAGE / batteryVoltage;
         }
         return Math.max(MIN_AUTO_POWER, Math.min(MAX_AUTO_POWER, power));
     }
