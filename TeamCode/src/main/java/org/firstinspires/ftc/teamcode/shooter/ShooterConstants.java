@@ -23,7 +23,7 @@ public class ShooterConstants {
     public static double HIVE_OPENING_HEIGHT_IN = 40.0;  // floor to the middle of the up CELL's opening
 
     public static boolean AUTO_AIM_ENABLED = true;       // false = always use SHOOTER_POWER
-    public static boolean AUTO_SPIN_UP = false;          // true = start the flywheel by itself when it sees our up CELL
+    public static boolean AUTO_SPIN_UP = false;
     public static long TAG_LOST_HOLD_MS = 750;           // keep the last auto power this long after losing the tag
     public static double MIN_AUTO_POWER = 0.30;
     public static double MAX_AUTO_POWER = 1.00;
