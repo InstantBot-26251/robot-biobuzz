@@ -5,8 +5,10 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class ShooterConstants {
 
+    public static double MAX_ACHIEVABLE_RPM = 6000;
+    public static  double TICKS_PER_REVOLUTION = 28;
 
-    public static double SHOOTER_VELOCITY = 1500; // ticks per second. TODO: tune on robot
+    public static double SHOOTER_VELOCITY = 3000; // in RPM
 
     public static double SHOOTER_P = 1;
     public static double SHOOTER_I = 0;
@@ -14,6 +16,10 @@ public class ShooterConstants {
     public static double SHOOTER_F = 0;
 
     public static double SERVO_POWER = 0.75;
-    public static long SERVO_WAIT_TIME = 10;
+    public static long SERVO_WAIT_TIME = 1;
     public static long POST_CYCLE_WAIT_TIME = 50;
+
+    public static double toTicksPerSec(double rpm) {
+        return (rpm / 60) * TICKS_PER_REVOLUTION;
+    }
 }

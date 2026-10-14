@@ -62,8 +62,8 @@ public class Shooter extends SubsystemIF {
         leftShooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-        rightShooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftShooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightShooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftShooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         rightShooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -78,7 +78,7 @@ public class Shooter extends SubsystemIF {
 
 
     public void enableShooter() {
-        shooterPID.setSetPoint(SHOOTER_VELOCITY);
+        shooterPID.setSetPoint(toTicksPerSec(SHOOTER_VELOCITY));
     }
 
 
@@ -115,9 +115,9 @@ public class Shooter extends SubsystemIF {
             rightShooterMotor.setPower(0);
             leftShooterMotor.setPower(0);
         } else {
-            output = shooterPID.calculate(velocity);
-            rightShooterMotor.setVelocity(output);
-            leftShooterMotor.setVelocity(output);
+            output = shooterPID.calculate(velocity) / toTicksPerSec(MAX_ACHIEVABLE_RPM);
+            rightShooterMotor.setPower(output);
+            leftShooterMotor.setPower(output);
         }
 
         telemetry.addData("Shooter Target Velocity", shooterPID.getSetPoint());
