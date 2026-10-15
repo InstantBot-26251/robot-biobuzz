@@ -25,7 +25,6 @@ public class Shooter extends SubsystemIF {
     private CRServo leftIntakeServo;
     private final PIDFController shooterPID;
 
-
     public Shooter(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
@@ -38,13 +37,11 @@ public class Shooter extends SubsystemIF {
         leftIntakeServo = hardwareMap.get(CRServo.class, "leftShooterServo");
     }
 
-
     @Override
     public void autonomousInit() {
         setUpMotors();
         setUpServos();
     }
-
 
     @Override
     public void teleopInit() {
@@ -52,57 +49,48 @@ public class Shooter extends SubsystemIF {
         setUpServos();
     }
 
-
     public void setUpMotors() {
         rightShooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         leftShooterMotor.setDirection(DcMotorEx.Direction.REVERSE);
 
-
         rightShooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftShooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
 
         rightShooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftShooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-
         rightShooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftShooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-
 
     public void setUpServos() {
         rightIntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
         leftIntakeServo.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
-
     public void enableShooter() {
         shooterPID.setSetPoint(toTicksPerSec(SHOOTER_VELOCITY));
     }
-
 
     public void startUpServos() {
         rightIntakeServo.setPower(SERVO_POWER);
         leftIntakeServo.setPower(SERVO_POWER);
     }
 
-
     public void stopShooter() {
         shooterPID.setSetPoint(0);
         rightIntakeServo.setPower(0);
         leftIntakeServo.setPower(0);
     }
+
     public void stopServos() {
         rightIntakeServo.setPower(0);
         leftIntakeServo.setPower(0);
     }
 
-
     public double getShooterVelocity() {
         return rightShooterMotor.getVelocity();
     }
-
 
     @Override
     public void periodic() {
