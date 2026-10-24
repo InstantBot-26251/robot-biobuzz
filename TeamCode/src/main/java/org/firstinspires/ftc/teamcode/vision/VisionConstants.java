@@ -23,7 +23,7 @@ public class VisionConstants {
 
     public static double LONG_SHOT_TRIM = 0.0;
 
-    public static double LAUNCH_ANGLE_DEG = 50.0;
+    public static double LAUNCH_ANGLE_DEG = 20.0;
     public static double LAUNCH_HEIGHT_IN = 12.0;
     public static double HIVE_OPENING_HEIGHT_IN = 40.0;
 
