@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.intake;
 
-import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 
-@Config
+@Configurable
 public class IntakeConstants {
     public static double MAX_ACHIEVABLE_RPM = 6000;
     public static double TICKS_PER_REVOLUTION = 28;
