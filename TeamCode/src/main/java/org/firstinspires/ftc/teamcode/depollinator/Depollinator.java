@@ -27,8 +27,8 @@ public class Depollinator extends SubsystemIF {
         armPosition = DEPOLLINATOR_ARM_REST;
         wheelPower = 0;
 
-        this.armServo = hardwareMap.get(Servo.class, "depollinatorArm");
-        this.wheelServo = hardwareMap.get(CRServo.class, "depollinatorWheel");
+        this.armServo = hardwareMap.get(Servo.class, "dePollinator1");
+        this.wheelServo = hardwareMap.get(CRServo.class, "dePollinator2");
     }
 
     @Override
