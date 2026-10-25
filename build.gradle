@@ -9,9 +9,6 @@ buildscript {
         mavenCentral()
         google()
         maven {
-            url = "https://mymaven.bylazar.com/releases"
-        }
-        maven {
             url = "https://repo.dairy.foundation/releases"
         }
     }
