@@ -73,8 +73,8 @@ public class Shooter extends SubsystemIF {
     }
 
     public void startUpServos() {
-        rightIntakeServo.setPower(SERVO_POWER);
-        leftIntakeServo.setPower(SERVO_POWER);
+        rightIntakeServo.setPower(0.75);
+        leftIntakeServo.setPower(0.75);
     }
 
     public void stopShooter() {
