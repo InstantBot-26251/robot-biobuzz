@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.bylazar.telemetry.JoinedTelemetry;
+import com.bylazar.telemetry.PanelsTelemetry;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -49,7 +51,10 @@ public class RobotContainer extends Robot {
         reset();
 
         this.hardwareMap = hardwareMap;
-        this.telemetry = telemetry;
+        this.telemetry = new JoinedTelemetry(
+                telemetry,
+                PanelsTelemetry.INSTANCE.getFtcTelemetry()
+        );
         this.gamepad1 = new GamepadEx(gamepad1);
         this.gamepad2 = new GamepadEx(gamepad2);
 
