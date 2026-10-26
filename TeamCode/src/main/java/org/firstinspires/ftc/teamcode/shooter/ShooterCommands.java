@@ -10,7 +10,6 @@ public class ShooterCommands {
         return Commands.runOnce(shooter::enableShooter, shooter);
     }
 
-
     public static Command disableShooter(Shooter shooter) {
         return Commands.runOnce(shooter::stopShooter, shooter);
     }
@@ -21,7 +20,7 @@ public class ShooterCommands {
 
     public static Command shoot(Shooter shooter) {
         return Commands.sequence(Commands.runOnce(shooter::enableShooter, shooter),
-                Commands.waitMillis(SERVO_WAIT_TIME),
+                Commands.waitMillis(10),
                 Commands.runOnce(shooter::startUpServos, shooter));
     }
 }
