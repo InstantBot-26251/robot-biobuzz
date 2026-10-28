@@ -17,7 +17,7 @@ public final class ShotCalculator {
         return Math.sqrt(GRAVITY_IN_PER_S2 * distanceIn * distanceIn / (2 * cos * cos * rise));
     }
 
-    public static double powerForDistance(double distanceIn) {
+    public static double rpmForDistance(double distanceIn) {
         double heightGain = HIVE_OPENING_HEIGHT_IN - LAUNCH_HEIGHT_IN;
         double needed = requiredBallSpeed(distanceIn, heightGain, LAUNCH_ANGLE_DEG);
         double atCalibration = requiredBallSpeed(CAL_DISTANCE_IN, heightGain, LAUNCH_ANGLE_DEG);
@@ -25,14 +25,14 @@ public final class ShotCalculator {
             return Double.NaN;
         }
         double trim = 1.0 + LONG_SHOT_TRIM * (distanceIn - CAL_DISTANCE_IN) / CAL_DISTANCE_IN;
-        return CAL_POWER * (needed / atCalibration) * trim;
+        return CAL_RPM * (needed / atCalibration) * trim;
     }
 
-    public static double motorPower(double distanceIn) {
-        double power = powerForDistance(distanceIn);
-        if (Double.isNaN(power)) {
+    public static double targetRpm(double distanceIn) {
+        double rpm = rpmForDistance(distanceIn);
+        if (Double.isNaN(rpm)) {
             return Double.NaN;
         }
-        return Math.max(MIN_AUTO_POWER, Math.min(MAX_AUTO_POWER, power));
+        return Math.max(MIN_AUTO_RPM, Math.min(MAX_AUTO_RPM, rpm));
     }
 }

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.bylazar.telemetry.JoinedTelemetry;
+import com.bylazar.telemetry.PanelsTelemetry;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -8,16 +10,18 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
+import com.seattlesolvers.solverslib.command.Commands;
 import com.seattlesolvers.solverslib.command.Robot;
 import com.seattlesolvers.solverslib.command.Subsystem;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.defloweringStick.DefloweringStick;
-import org.firstinspires.ftc.teamcode.defloweringStick.DefloweringStickCommands;
+import org.firstinspires.ftc.teamcode.depollinator.Depollinator;
+import org.firstinspires.ftc.teamcode.depollinator.DepollinatorCommands;
 import org.firstinspires.ftc.teamcode.intake.Intake;
 import org.firstinspires.ftc.teamcode.intake.IntakeCommands;
+import org.firstinspires.ftc.teamcode.opmodes.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
@@ -38,7 +42,7 @@ public class RobotContainer extends Robot {
     private final Shooter shooter;
     private final Intake intake;
 
-    private final DefloweringStick defloweringStick;
+    private final Depollinator depollinator;
     private final Vision vision;
 
     private HardwareMap hardwareMap;
@@ -51,7 +55,10 @@ public class RobotContainer extends Robot {
         reset();
 
         this.hardwareMap = hardwareMap;
-        this.telemetry = telemetry;
+        this.telemetry = new JoinedTelemetry(
+                telemetry,
+                PanelsTelemetry.INSTANCE.getFtcTelemetry()
+        );
         this.gamepad1 = new GamepadEx(gamepad1);
         this.gamepad2 = new GamepadEx(gamepad2);
 
@@ -64,10 +71,10 @@ public class RobotContainer extends Robot {
         chassis = new Chassis(telemetry, hardwareMap);
         shooter = new Shooter(telemetry, hardwareMap);
         intake = new Intake(telemetry, hardwareMap);
-        defloweringStick = new DefloweringStick(telemetry, hardwareMap);
+        depollinator = new Depollinator(telemetry, hardwareMap);
         vision = new Vision(telemetry, hardwareMap);
 
-        subsystems.addAll(List.of(chassis, intake, shooter, vision));
+        subsystems.addAll(List.of(chassis, intake, shooter, depollinator, vision));
 
         for(Subsystem s : subsystems) {
             register(s);
@@ -105,16 +112,17 @@ public class RobotContainer extends Robot {
 
         shooter.setDefaultCommand(ShooterCommands.autoAim(shooter, vision));
 
-        //for the shooters, the trigger buttons should shoot.
         gamepad2.getGamepadButton(GamepadKeys.Button.A).whenPressed(ShooterCommands.enableShooter(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.Y).whenPressed(ShooterCommands.disableShooter(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.shoot(shooter, vision))
                 .whenReleased(ShooterCommands.disableShooterServo(shooter));
+
         gamepad2.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(IntakeCommands.intake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
-        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenPressed(DefloweringStickCommands
-                .deflower(defloweringStick)).whenReleased(DefloweringStickCommands.restDeflowering(defloweringStick));
+        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(DepollinatorCommands.depollinate(depollinator))
+                .whenReleased(DepollinatorCommands.restDepollinator(depollinator));
         gamepad2.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(IntakeCommands.outtake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
@@ -134,6 +142,22 @@ public class RobotContainer extends Robot {
 
     public Command followPath(Path path, boolean holdEnd) {
         return ChassisCommands.createFollowPathCommand(chassis, path, holdEnd);
+    }
+
+    public Command enableShooter() {
+        return ShooterCommands.enableShooter(shooter);
+    }
+
+    public Command shootFor(long shootTime) {
+        return Commands.sequence(
+                ShooterCommands.aimShooter(shooter, vision),
+                ShooterCommands.enableShooter(shooter),
+                Commands.race(
+                        Commands.waitUntil(shooter::atTargetVelocity),
+                        Commands.waitMillis(AutoConstants.MAX_SPIN_UP_TIME)),
+                ShooterCommands.shoot(shooter, vision),
+                Commands.waitMillis(shootTime),
+                ShooterCommands.disableShooter(shooter));
     }
 
     public void periodic() {

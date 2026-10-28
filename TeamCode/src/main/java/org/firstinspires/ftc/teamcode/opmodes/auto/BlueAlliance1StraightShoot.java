@@ -31,7 +31,9 @@ public class BlueAlliance1StraightShoot extends AutoFactory {
     @Override
     protected Command createAutoSequence() {
         return Commands.sequence(
-                robot.followPath(path1())
+                robot.enableShooter(),
+                robot.followPath(path1()),
+                robot.shootFor(AutoConstants.SHOOT_TIME)
         );
     }
 }

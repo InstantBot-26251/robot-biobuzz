@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.vision;
 
-import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 
-@Config
+@Configurable
 public class VisionConstants {
     public static int RED_PIPELINE = 0;
     public static int BLUE_PIPELINE = 1;
@@ -19,7 +19,7 @@ public class VisionConstants {
     public static long MAX_RESULT_AGE_MS = 20;
 
     public static double CAL_DISTANCE_IN = 60.0;
-    public static double CAL_POWER = 0.55;
+    public static double CAL_RPM = 3000;
 
     public static double LONG_SHOT_TRIM = 0.0;
 
@@ -29,6 +29,6 @@ public class VisionConstants {
 
     public static boolean AUTO_SPIN_UP = false;
     public static long TAG_LOST_HOLD_MS = 750;
-    public static double MIN_AUTO_POWER = 0.30;
-    public static double MAX_AUTO_POWER = 1.00;
+    public static double MIN_AUTO_RPM = 1500;
+    public static double MAX_AUTO_RPM = 5000;
 }
