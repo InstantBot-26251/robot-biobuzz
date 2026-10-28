@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.bylazar.telemetry.JoinedTelemetry;
-import com.bylazar.telemetry.PanelsTelemetry;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.lynx.LynxModule;
