@@ -6,10 +6,16 @@ import com.pedropathing.paths.Path;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.Commands;
 
+import org.firstinspires.ftc.teamcode.util.Alliance;
 import org.firstinspires.ftc.teamcode.util.AutoFactory;
 
 public class Example extends AutoFactory {
     private final Pose path1 = poseFactory.of(85.6805, 109.4573, 270);
+
+    @Override
+    protected Alliance getAlliance() {
+        return Alliance.BLUE;
+    }
 
     @Override
     protected Pose setStartPose() {

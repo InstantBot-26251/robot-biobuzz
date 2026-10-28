@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.bylazar.telemetry.JoinedTelemetry;
+import com.bylazar.telemetry.PanelsTelemetry;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -8,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
+import com.seattlesolvers.solverslib.command.Commands;
 import com.seattlesolvers.solverslib.command.Robot;
 import com.seattlesolvers.solverslib.command.Subsystem;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -18,6 +21,7 @@ import org.firstinspires.ftc.teamcode.depollinator.Depollinator;
 import org.firstinspires.ftc.teamcode.depollinator.DepollinatorCommands;
 import org.firstinspires.ftc.teamcode.intake.Intake;
 import org.firstinspires.ftc.teamcode.intake.IntakeCommands;
+import org.firstinspires.ftc.teamcode.opmodes.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
@@ -49,7 +53,10 @@ public class RobotContainer extends Robot {
         reset();
 
         this.hardwareMap = hardwareMap;
-        this.telemetry = telemetry;
+        this.telemetry = new JoinedTelemetry(
+                telemetry,
+                PanelsTelemetry.INSTANCE.getFtcTelemetry()
+        );
         this.gamepad1 = new GamepadEx(gamepad1);
         this.gamepad2 = new GamepadEx(gamepad2);
 
@@ -98,11 +105,11 @@ public class RobotContainer extends Robot {
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
 
-        //for the shooters, the trigger buttons should shoot.
         gamepad2.getGamepadButton(GamepadKeys.Button.A).whenPressed(ShooterCommands.enableShooter(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.Y).whenPressed(ShooterCommands.disableShooter(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.shoot(shooter))
                 .whenReleased(ShooterCommands.disableShooterServo(shooter));
+
         gamepad2.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(IntakeCommands.intake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
@@ -128,6 +135,21 @@ public class RobotContainer extends Robot {
 
     public Command followPath(Path path, boolean holdEnd) {
         return ChassisCommands.createFollowPathCommand(chassis, path, holdEnd);
+    }
+
+    public Command enableShooter() {
+        return ShooterCommands.enableShooter(shooter);
+    }
+
+    public Command shootFor(long shootTime) {
+        return Commands.sequence(
+                ShooterCommands.enableShooter(shooter),
+                Commands.race(
+                        Commands.waitUntil(shooter::atTargetVelocity),
+                        Commands.waitMillis(AutoConstants.MAX_SPIN_UP_TIME)),
+                ShooterCommands.shoot(shooter),
+                Commands.waitMillis(shootTime),
+                ShooterCommands.disableShooter(shooter));
     }
 
     public void periodic() {
