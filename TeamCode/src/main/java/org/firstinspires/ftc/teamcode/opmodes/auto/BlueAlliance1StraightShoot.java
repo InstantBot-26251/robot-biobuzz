@@ -7,11 +7,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.Commands;
 
+import org.firstinspires.ftc.teamcode.util.Alliance;
 import org.firstinspires.ftc.teamcode.util.AutoFactory;
 
 @Autonomous(name = "Blue Alliance Straight Shoot-D,6")
 public class BlueAlliance1StraightShoot extends AutoFactory {
     private final Pose point1 = poseFactory.of(85.6805, 109.4573, 270);
+
+    @Override
+    protected Alliance getAlliance() {
+        return Alliance.BLUE;
+    }
 
     @Override
     protected Pose setStartPose() {
@@ -25,7 +31,9 @@ public class BlueAlliance1StraightShoot extends AutoFactory {
     @Override
     protected Command createAutoSequence() {
         return Commands.sequence(
-                robot.followPath(path1())
+                robot.enableShooter(),
+                robot.followPath(path1()),
+                robot.shootFor(AutoConstants.SHOOT_TIME)
         );
     }
 }

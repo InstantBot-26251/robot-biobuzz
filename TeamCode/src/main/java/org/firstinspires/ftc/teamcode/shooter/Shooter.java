@@ -92,6 +92,11 @@ public class Shooter extends SubsystemIF {
         return rightShooterMotor.getVelocity();
     }
 
+    public boolean atTargetVelocity() {
+        return shooterPID.getSetPoint() != 0
+                && Math.abs(getShooterVelocity() - shooterPID.getSetPoint()) <= toTicksPerSec(SHOOTER_VELOCITY_TOLERANCE);
+    }
+
     @Override
     public void periodic() {
         shooterPID.setPIDF(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F); // TODO: delete once the PID is tuned

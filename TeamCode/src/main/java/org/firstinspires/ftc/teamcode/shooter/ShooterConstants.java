@@ -9,6 +9,7 @@ public class ShooterConstants {
     public static  double TICKS_PER_REVOLUTION = 28;
 
     public static double SHOOTER_VELOCITY = 3000; // in RPM
+    public static double SHOOTER_VELOCITY_TOLERANCE = 150;
 
     public static double SHOOTER_P = 1;
     public static double SHOOTER_I = 0;
