@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
+
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -9,25 +10,25 @@ import com.seattlesolvers.solverslib.controller.PIDFController;
 
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
-
 import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
-
 public class Shooter extends SubsystemIF {
+
+
     private final Telemetry telemetry;
-    private final HardwareMap hardwareMap;
+    private final  HardwareMap hardwareMap;
     private DcMotorEx rightShooterMotor;
     private DcMotorEx leftShooterMotor;
     private CRServo rightIntakeServo;
     private CRServo leftIntakeServo;
     private final PIDFController shooterPID;
-    private double targetVelocity;
 
     public Shooter(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
         shooterPID = new PIDFController(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F);
-        targetVelocity = SHOOTER_VELOCITY;
 
 
         rightShooterMotor = hardwareMap.get(DcMotorEx.class, "rightShooterMotor");
@@ -68,16 +69,6 @@ public class Shooter extends SubsystemIF {
     }
 
     public void enableShooter() {
-        shooterPID.setSetPoint(toTicksPerSec(targetVelocity));
-    }
-
-    public void setTargetVelocity(double rpm) {
-        targetVelocity = rpm;
-        if (shooterPID.getSetPoint() != 0) {
-            shooterPID.setSetPoint(toTicksPerSec(targetVelocity));
-        }
-    }
-
         shooterPID.setSetPoint(toTicksPerSec(SHOOTER_VELOCITY));
     }
 
@@ -108,7 +99,6 @@ public class Shooter extends SubsystemIF {
 
     @Override
     public void periodic() {
-        shooterPID.setPIDF(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F); // TODO: delete once the PID is tuned
 
         double velocity = getShooterVelocity();
         double output = 0;
@@ -122,7 +112,6 @@ public class Shooter extends SubsystemIF {
             leftShooterMotor.setPower(output);
         }
 
-        telemetry.addData("Shooter Aim RPM", targetVelocity);
         telemetry.addData("Shooter Target Velocity", shooterPID.getSetPoint());
         telemetry.addData("Shooter Velocity", velocity);
         telemetry.addData("Shooter PID Output", output);

@@ -45,10 +45,10 @@ public class RobotContainer extends Robot {
     private final Vision vision;
     private final Depollinator depollinator;
 
-    private HardwareMap hardwareMap;
-    private Telemetry telemetry;
-    private GamepadEx gamepad1;
-    private GamepadEx gamepad2;
+    private final HardwareMap hardwareMap;
+    private final Telemetry telemetry;
+    private final GamepadEx gamepad1;
+    private final GamepadEx gamepad2;
 
     public RobotContainer(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
 
