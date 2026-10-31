@@ -17,6 +17,8 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.depollinator.Depollinator;
+import org.firstinspires.ftc.teamcode.depollinator.DepollinatorCommands;
 import org.firstinspires.ftc.teamcode.intake.Intake;
 import org.firstinspires.ftc.teamcode.intake.IntakeCommands;
 import org.firstinspires.ftc.teamcode.opmodes.auto.AutoConstants;
@@ -41,6 +43,7 @@ public class RobotContainer extends Robot {
     private final Intake intake;
 
     private final Vision vision;
+    private final Depollinator depollinator;
 
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
@@ -71,6 +74,12 @@ public class RobotContainer extends Robot {
         vision = new Vision(this.telemetry, hardwareMap);
 
         subsystems.addAll(List.of(chassis, intake, shooter, vision));
+        chassis = new Chassis(telemetry, hardwareMap);
+        shooter = new Shooter(telemetry, hardwareMap);
+        intake = new Intake(telemetry, hardwareMap);
+        depollinator = new Depollinator(telemetry, hardwareMap);
+
+        subsystems.addAll(List.of(chassis, intake, shooter, depollinator));
 
         for(Subsystem s : subsystems) {
             register(s);
@@ -116,6 +125,9 @@ public class RobotContainer extends Robot {
         gamepad2.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(IntakeCommands.intake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
+        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(DepollinatorCommands.depollinate(depollinator))
+                .whenReleased(DepollinatorCommands.restDepollinator(depollinator));
         gamepad2.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(IntakeCommands.outtake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
@@ -149,6 +161,7 @@ public class RobotContainer extends Robot {
                         Commands.waitUntil(shooter::atTargetVelocity),
                         Commands.waitMillis(AutoConstants.MAX_SPIN_UP_TIME)),
                 ShooterCommands.shoot(shooter, vision),
+                ShooterCommands.shoot(shooter),
                 Commands.waitMillis(shootTime),
                 ShooterCommands.disableShooter(shooter));
     }

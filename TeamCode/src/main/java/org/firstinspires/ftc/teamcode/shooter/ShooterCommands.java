@@ -8,6 +8,8 @@ import org.firstinspires.ftc.teamcode.vision.Vision;
 import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
 import static org.firstinspires.ftc.teamcode.vision.VisionConstants.*;
 
+import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
+
 public class ShooterCommands {
     public static Command enableShooter(Shooter shooter) {
         return Commands.runOnce(shooter::enableShooter, shooter);
@@ -32,6 +34,8 @@ public class ShooterCommands {
     public static Command shoot(Shooter shooter, Vision vision) {
         return Commands.sequence(Commands.runOnce(shooter::enableShooter, shooter),
                 aimShooter(shooter, vision),
+    public static Command shoot(Shooter shooter) {
+        return Commands.sequence(Commands.runOnce(shooter::enableShooter, shooter),
                 Commands.waitMillis(10),
                 Commands.runOnce(shooter::startUpServos, shooter));
     }

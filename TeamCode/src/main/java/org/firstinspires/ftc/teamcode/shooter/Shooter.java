@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 
@@ -27,6 +28,7 @@ public class Shooter extends SubsystemIF {
         this.hardwareMap = hardwareMap;
         shooterPID = new PIDFController(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F);
         targetVelocity = SHOOTER_VELOCITY;
+
 
         rightShooterMotor = hardwareMap.get(DcMotorEx.class, "rightShooterMotor");
         leftShooterMotor = hardwareMap.get(DcMotorEx.class, "leftShooterMotor");
@@ -74,6 +76,9 @@ public class Shooter extends SubsystemIF {
         if (shooterPID.getSetPoint() != 0) {
             shooterPID.setSetPoint(toTicksPerSec(targetVelocity));
         }
+    }
+
+        shooterPID.setSetPoint(toTicksPerSec(SHOOTER_VELOCITY));
     }
 
     public void startUpServos() {

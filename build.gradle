@@ -8,6 +8,9 @@ buildscript {
     repositories {
         mavenCentral()
         google()
+        maven {
+            url = "https://repo.dairy.foundation/releases"
+        }
     }
 }
 
