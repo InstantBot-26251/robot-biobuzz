@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
-import com.bylazar.configurables.annotations.Configurable;
-
-@Configurable
 public class ShooterConstants {
 
     public static double MAX_ACHIEVABLE_RPM = 6000;

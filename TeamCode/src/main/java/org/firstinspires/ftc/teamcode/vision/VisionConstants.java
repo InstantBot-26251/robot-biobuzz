@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.vision;
 
-import com.bylazar.configurables.annotations.Configurable;
-
-@Configurable
 public class VisionConstants {
     public static int RED_PIPELINE = 0;
     public static int BLUE_PIPELINE = 1;
