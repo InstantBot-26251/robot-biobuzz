@@ -15,12 +15,14 @@ public class VisionConstants {
 
     public static double UP_CELL_TAG_HEIGHT_IN = 49.9;
     public static double DOWN_CELL_TAG_HEIGHT_IN = 35.6;
-    public static boolean USE_TAG_RANGE = true;
+    public static boolean USE_TAG_RANGE = false;
+    public static boolean SIMPLE_TRACKING = true;
+    public static double SIMPLE_TAG_HEIGHT_IN = 49.9;
 
     public static int FILTER_SAMPLES = 5;
     public static long FILTER_WINDOW_MS = 600;
     public static long TARGET_MEMORY_MS = 4000;
-    public static long MAX_FRAME_AGE_MS = 150;
+    public static long MAX_FRAME_AGE_MS = 500;
 
     public static boolean USE_FIELD_MAP = false;
     public static double HIVE_CENTER_X_IN = 72;
