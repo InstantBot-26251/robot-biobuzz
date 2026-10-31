@@ -92,6 +92,11 @@ public class Shooter extends SubsystemIF {
         return rightShooterMotor.getVelocity();
     }
 
+    public boolean atTargetVelocity() {
+        return shooterPID.getSetPoint() != 0
+                && Math.abs(getShooterVelocity() - shooterPID.getSetPoint()) <= toTicksPerSec(SHOOTER_VELOCITY_TOLERANCE);
+    }
+
     @Override
     public void periodic() {
 
