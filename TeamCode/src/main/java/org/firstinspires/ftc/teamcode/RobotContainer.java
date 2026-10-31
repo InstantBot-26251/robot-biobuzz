@@ -36,6 +36,7 @@ import java.util.List;
 
 public class RobotContainer extends Robot {
     public static Pose ROBOT_POSE = null;
+    public static boolean POSE_FROM_AUTO = false;
     private final List<SubsystemIF> subsystems = new ArrayList<>();
     private final ElapsedTime timer = new ElapsedTime();
     private final List<LynxModule> hubs;
@@ -176,6 +177,7 @@ public class RobotContainer extends Robot {
 
     public void stop() {
         ROBOT_POSE = chassis.getPose();
+        POSE_FROM_AUTO = !teleop;
         limelight.stop();
     }
 

@@ -23,8 +23,8 @@ public class OTOSCalibration extends LinearOpMode {
     public static double PUSH_DISTANCE_IN = 48;
     public static int SPIN_TURNS = 5;
 
-    private static final double SCALAR_MIN = 0.8;
-    private static final double SCALAR_MAX = 1.2;
+    private static final double SCALAR_MIN = 0.872;
+    private static final double SCALAR_MAX = 1.127;
 
     private Telemetry t;
     private Mecanum drive;
@@ -93,8 +93,8 @@ public class OTOSCalibration extends LinearOpMode {
         double linearScalar = PUSH_DISTANCE_IN / pushedDistance;
         if (linearScalar > 1.5) {
             fail(String.format("Measured %.1f in for a %.1f in push (%.0fx too little). The OTOS is losing tracking: "
-                    + "it is probably too high off the floor (needs ~10 mm) or the cover film is still on. "
-                    + "A scalar can't fix this; the chip only accepts 0.872-1.127.",
+                            + "it is probably too high off the floor (needs ~10 mm) or the cover film is still on. "
+                            + "A scalar can't fix this; the chip only accepts 0.872-1.127.",
                     pushedDistance, PUSH_DISTANCE_IN, linearScalar));
             return;
         }
@@ -214,7 +214,7 @@ public class OTOSCalibration extends LinearOpMode {
     }
 
     private void stopDrive() {
-        drive.stop(true);
+        drive.stop(false);
     }
 
     private boolean aPressed() {

@@ -10,6 +10,7 @@ public class ResetRobot extends OpMode {
     @Override
     public void init() {
         RobotContainer.ROBOT_POSE = null;
+        RobotContainer.POSE_FROM_AUTO = false;
         stop();
     }
 

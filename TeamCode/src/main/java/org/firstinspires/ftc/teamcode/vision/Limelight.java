@@ -52,7 +52,7 @@ public class Limelight extends SubsystemIF {
 
     @Override
     public void teleopInit() {
-        start(RobotContainer.ROBOT_POSE != null);
+        start(RobotContainer.ROBOT_POSE != null && RobotContainer.POSE_FROM_AUTO);
     }
 
     private void start(boolean fieldLocalized) {
@@ -130,8 +130,8 @@ public class Limelight extends SubsystemIF {
         telemetry.addData("LL Latency (ms)", lastLatencyMs);
         telemetry.addData("LL Field Map", !USE_FIELD_MAP ? "off"
                 : tracker.isMapRejected() ? "DISAGREES with camera -> disabled"
-                : tracker.isMapConfirmed() ? String.format("confirmed (%.1f in off)", tracker.getLastMapErrorIn())
-                : tracker.mapUsable() ? "in use, not yet confirmed" : "not used (pose not from auto)");
+                  : tracker.isMapConfirmed() ? String.format("confirmed (%.1f in off)", tracker.getLastMapErrorIn())
+                    : tracker.mapUsable() ? "in use, not yet confirmed" : "not used (pose not from auto)");
     }
 
     private void process(LLResult result) {

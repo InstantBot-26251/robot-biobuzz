@@ -27,6 +27,7 @@ public class DriveCheck extends OpMode {
     private long lastNanos;
     private String forwardResult = "untested", strafeResult = "untested", turnResult = "untested";
     private double fwdScore = 0, strScore = 0, turnScore = 0;
+    private boolean wasTesting = false;
 
     @Override
     public void init() {
@@ -67,14 +68,25 @@ public class DriveCheck extends OpMode {
         double cmdTurn = -gamepad1.right_stick_x;
 
         if (testing != null) {
-            drive.stop(true);
+            if (!wasTesting) drive.stop(true);
             fl.setPower(gamepad1.dpad_up ? wheel : 0);
             fr.setPower(gamepad1.dpad_right ? wheel : 0);
             br.setPower(gamepad1.dpad_down ? wheel : 0);
             bl.setPower(gamepad1.dpad_left ? wheel : 0);
         } else {
-            drive.drive(new DrivePowers(cmdFwd * 0.5, cmdLeft * 0.5, cmdTurn * 0.4), true);
+            if (wasTesting) {
+                fl.setPower(0);
+                fr.setPower(0);
+                bl.setPower(0);
+                br.setPower(0);
+            }
+            if (Math.abs(cmdFwd) < 0.05 && Math.abs(cmdLeft) < 0.05 && Math.abs(cmdTurn) < 0.05) {
+                drive.stop(false);
+            } else {
+                drive.drive(new DrivePowers(cmdFwd * 0.5, cmdLeft * 0.5, cmdTurn * 0.4), true);
+            }
         }
+        wasTesting = testing != null;
 
         Pose pose = otos.pose();
         long now = System.nanoTime();
@@ -132,6 +144,10 @@ public class DriveCheck extends OpMode {
 
     @Override
     public void stop() {
+        fl.setPower(0);
+        fr.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
         drive.stop(true);
     }
 }

@@ -4,8 +4,8 @@ import com.bylazar.configurables.annotations.Configurable;
 
 @Configurable
 public class ShooterConstants {
-    public static double[] SHOT_DISTANCES_IN = {26.0};
-    public static double[] SHOT_RPMS = {4500};
+    public static double[] SHOT_DISTANCES_IN = {};
+    public static double[] SHOT_RPMS = {};
 
     public static double DEFAULT_RPM = 4500;
 

@@ -22,7 +22,9 @@ public class DriverControlled extends OpMode {
     public void init_loop() {
         robot.getTelemetry().addLine("ALLIANCE: " + Alliance.getCurrent()
                 + "   (wrong? stop and run \"Set Alliance: " + (Alliance.getCurrent() == Alliance.RED ? "BLUE" : "RED") + "\")");
-        robot.getTelemetry().addData("Pose from auto", RobotContainer.ROBOT_POSE == null ? "none (press START when facing away from you)" : "yes");
+        robot.getTelemetry().addData("Pose from auto", RobotContainer.ROBOT_POSE == null
+                ? "none (press START when facing away from you)"
+                : RobotContainer.POSE_FROM_AUTO ? "yes (field map on)" : "from last teleop (field map off)");
         robot.initLoop();
     }
 
