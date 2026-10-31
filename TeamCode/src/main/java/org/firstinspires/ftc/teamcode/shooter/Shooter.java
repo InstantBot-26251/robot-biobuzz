@@ -68,6 +68,7 @@ public class Shooter extends SubsystemIF {
     private boolean encoderMismatch = false;
     private final ElapsedTime voltageTimer = new ElapsedTime();
     private final ElapsedTime feedRequestTimer = new ElapsedTime();
+    private int loadedShotPoints = 0;
 
     public Shooter(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
@@ -79,6 +80,7 @@ public class Shooter extends SubsystemIF {
         leftIntakeServo = hardwareMap.get(CRServo.class, "leftShooterServo");
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
         voltage = voltageSensor.getVoltage();
+        loadedShotPoints = ShotTableStore.load();
     }
 
     @Override
@@ -305,6 +307,13 @@ public class Shooter extends SubsystemIF {
 
         telemetry.addLine();
         telemetry.addData("Shooter Mode", mode + (mode == Mode.AUTO ? (usingDistance ? " (Limelight)" : " (DEFAULT_RPM)") : ""));
+        StringBuilder table = new StringBuilder();
+        for (int i = 0; i < Math.min(SHOT_DISTANCES_IN.length, SHOT_RPMS.length); i++) {
+            table.append(i == 0 ? "" : " | ")
+                    .append(String.format(java.util.Locale.US, "%.0fin=%.0f", SHOT_DISTANCES_IN[i], SHOT_RPMS[i]));
+        }
+        telemetry.addData("Shot Table", (table.length() == 0 ? "EMPTY" : table.toString())
+                + (loadedShotPoints > 0 ? " (from Shot Tuner file)" : " (from ShooterConstants)"));
         telemetry.addData("Shooter Target RPM", targetRpm);
         telemetry.addData("Shooter RPM", measuredRpm);
         telemetry.addData("Shooter Power", power);

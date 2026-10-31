@@ -178,6 +178,17 @@ public class HiveTracker {
         lastUpTags = 0;
         if (ours.isEmpty()) return;
 
+        if (SIMPLE_TRACKING) {
+            int[] count = new int[2];
+            for (Sighting s : ours) count[s.cell]++;
+            int cell = count[0] == count[1] ? currentUpCell : count[0] > count[1] ? 0 : 1;
+            lastUsedRange = false;
+            switchUpCell(cell);
+            addFix(projectCell(ours, cell, SIMPLE_TAG_HEIGHT_IN, Double.NEGATIVE_INFINITY, capturePose),
+                    cell, nowMs, " (simple)");
+            return;
+        }
+
         double split = 0.5 * (UP_CELL_TAG_HEIGHT_IN + DOWN_CELL_TAG_HEIGHT_IN);
         double[] heightSum = new double[2];
         int[] heightCount = new int[2];
@@ -225,31 +236,38 @@ public class HiveTracker {
             upCell = c;
         }
         switchUpCell(upCell);
+        addFix(projectCell(ours, upCell, UP_CELL_TAG_HEIGHT_IN, split, capturePose), upCell, nowMs, " UP");
+    }
 
+    private List<double[]> projectCell(List<Sighting> ours, int cell, double tagHeight, double minHeight, Pose capturePose) {
         List<double[]> points = new ArrayList<>();
         for (Sighting s : ours) {
-            if (s.cell != upCell) continue;
-            if (!Double.isNaN(s.height) && s.height < split) continue;
-            double[] robotPoint = TargetMath.targetInRobotFrame(s.tx, s.ty, UP_CELL_TAG_HEIGHT_IN,
+            if (s.cell != cell) continue;
+            if (!Double.isNaN(s.height) && s.height < minHeight) continue;
+            double[] robotPoint = TargetMath.targetInRobotFrame(s.tx, s.ty, tagHeight,
                     CAMERA_HEIGHT_IN, CAMERA_PITCH_DEG, CAMERA_YAW_DEG, CAMERA_FORWARD_IN, CAMERA_LEFT_IN);
             if (robotPoint == null) continue;
             double[] field = TargetMath.robotToField(robotPoint, capturePose.x(), capturePose.y(), capturePose.heading());
             points.add(new double[]{field[0], field[1], TAG_LATERAL_OFFSET_IN[s.slot]});
         }
+        return points;
+    }
+
+    private void addFix(List<double[]> points, int cell, double nowMs, String label) {
         lastUpTags = points.size();
         if (points.isEmpty()) {
-            lastNote = "up cell seen but tags unusable";
+            lastNote = cellName(cell) + label + ": tags seen but unusable";
             return;
         }
 
-        boolean axisKnown = CELL_AXIS[axisIndex(upCell)] != null;
+        boolean axisKnown = CELL_AXIS[axisIndex(cell)] != null;
         if (points.size() == 1 && !axisKnown && (nowMs - lastSeenMs < TARGET_MEMORY_MS || mapUsable())) {
-            lastNote = cellName(upCell) + " UP (1 tag, kept previous fix)";
+            lastNote = cellName(cell) + label + " (1 tag, kept previous fix)";
             return;
         }
-        double[] center = clusterCenter(points, upCell);
-        checkAgainstMap(center, upCell);
-        lastNote = cellName(upCell) + " UP";
+        double[] center = clusterCenter(points, cell);
+        if (!SIMPLE_TRACKING) checkAgainstMap(center, cell);
+        lastNote = cellName(cell) + label;
 
         sampleX[sampleHead] = center[0];
         sampleY[sampleHead] = center[1];

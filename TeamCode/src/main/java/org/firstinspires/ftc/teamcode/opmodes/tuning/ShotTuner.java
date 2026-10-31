@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.opmodes.tuning;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.shooter.ShooterConstants;
+import org.firstinspires.ftc.teamcode.shooter.ShotTableStore;
 import org.firstinspires.ftc.teamcode.opmodes.Alliance;
 import org.firstinspires.ftc.teamcode.opmodes.AllianceStore;
 
@@ -25,6 +27,8 @@ public class ShotTuner extends OpMode {
     private boolean spinning = false;
     private final List<double[]> points = new ArrayList<>();
     private boolean pA, pB, pY, pBack, pUp, pDown, pLeft, pRight, pRB, pLB;
+    private String status = "";
+    private final ElapsedTime statusTimer = new ElapsedTime();
 
     @Override
     public void init() {
@@ -51,6 +55,11 @@ public class ShotTuner extends OpMode {
     public void start() {
         if (RobotContainer.ROBOT_POSE == null) robot.getChassis().resetHeading();
         robot.getLimelight().clear();
+    }
+
+    private void showStatus(String message) {
+        status = message;
+        statusTimer.reset();
     }
 
     @Override
@@ -85,22 +94,27 @@ public class ShotTuner extends OpMode {
         double distance = robot.getLimelight().getDistance(robot.getChassis().getPose());
         if (y && !pY) {
             if (Double.isNaN(distance)) {
-                t.addLine("!! Can't save: Limelight doesn't see your hive");
+                showStatus("!! NOT SAVED: Limelight doesn't see your hive. Turn until distance shows a number.");
+                gamepad1.rumble(100);
             } else {
                 points.add(new double[]{distance, tunerRpm});
                 applyTable();
+                showStatus(String.format(Locale.US, "SAVED point %d: %.1f in -> %.0f RPM (kept after restart)",
+                        points.size(), distance, tunerRpm));
+                gamepad1.rumbleBlips(2);
             }
         }
         if (back && !pBack && !points.isEmpty()) {
             points.remove(points.size() - 1);
             applyTable();
+            showStatus("Deleted last point. " + points.size() + " left.");
         }
 
         pA = a; pB = b; pY = y; pBack = back; pUp = up; pDown = down; pLeft = left; pRight = right; pRB = rb; pLB = lb;
 
-        robot.periodic();
-
         t.addLine("===== SHOT TUNER =====");
+        if (!status.isEmpty() && statusTimer.seconds() < 4) t.addLine(">> " + status);
+        t.addLine("A spin | B stop | dpad +/-50 +/-250 | RB shoot | Y save | BACK undo");
         t.addData("Tuner RPM", tunerRpm);
         t.addData("Limelight distance (in)", distance);
         t.addData("RPM the table would pick", ShooterConstants.SHOT_RPMS.length == 0 ? Double.NaN :
@@ -116,9 +130,15 @@ public class ShotTuner extends OpMode {
             t.addData("FF TEST -> SHOOTER_KV", kv);
             t.addLine("(wait until RPM stops climbing, then copy SHOOTER_KV)");
         }
-        t.addLine("Saved points (paste into ShooterConstants):");
-        t.addLine(tableString());
-        t.update();
+        t.addLine("--- SAVED POINTS (stored on the Control Hub) ---");
+        if (ShooterConstants.SHOT_DISTANCES_IN.length == 0) t.addLine("  none yet - press Y to save one");
+        for (int i = 0; i < Math.min(ShooterConstants.SHOT_DISTANCES_IN.length, ShooterConstants.SHOT_RPMS.length); i++) {
+            t.addLine(String.format(Locale.US, "  %d)  %.1f in  ->  %.0f RPM",
+                    i + 1, ShooterConstants.SHOT_DISTANCES_IN[i], ShooterConstants.SHOT_RPMS[i]));
+        }
+        t.addLine("===== END SHOT TUNER =====");
+
+        robot.periodic();
     }
 
     private void applyTable() {
@@ -132,20 +152,7 @@ public class ShotTuner extends OpMode {
         }
         ShooterConstants.SHOT_DISTANCES_IN = d;
         ShooterConstants.SHOT_RPMS = r;
-    }
-
-    private String tableString() {
-        StringBuilder ds = new StringBuilder("SHOT_DISTANCES_IN = {");
-        StringBuilder rs = new StringBuilder("SHOT_RPMS = {");
-        for (int i = 0; i < ShooterConstants.SHOT_DISTANCES_IN.length; i++) {
-            if (i > 0) {
-                ds.append(", ");
-                rs.append(", ");
-            }
-            ds.append(String.format(Locale.US, "%.1f", ShooterConstants.SHOT_DISTANCES_IN[i]));
-            rs.append(String.format(Locale.US, "%.0f", ShooterConstants.SHOT_RPMS[i]));
-        }
-        return ds.append("};\n").append(rs.append("};")).toString();
+        if (!ShotTableStore.save(d, r)) showStatus("!! Could not write " + ShotTableStore.path());
     }
 
     @Override

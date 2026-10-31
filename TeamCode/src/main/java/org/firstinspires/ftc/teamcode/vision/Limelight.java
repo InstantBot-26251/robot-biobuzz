@@ -103,8 +103,19 @@ public class Limelight extends SubsystemIF {
 
     @Override
     public void periodic() {
+        String raw = "no Limelight device";
         if (limelight != null) {
             LLResult result = limelight.getLatestResult();
+            if (result == null) {
+                raw = "NO RESULT (connected " + limelight.isConnected() + ", running " + limelight.isRunning() + ")";
+            } else {
+                StringBuilder ids = new StringBuilder();
+                for (LLResultTypes.FiducialResult f : result.getFiducialResults()) {
+                    ids.append(ids.length() == 0 ? "" : ",").append(f.getFiducialId());
+                }
+                raw = "pipeline " + result.getPipelineIndex() + " | valid " + result.isValid()
+                        + " | age " + result.getStaleness() + " ms | tag IDs " + (ids.length() == 0 ? "none" : ids);
+            }
             if (result != null && result.isValid()
                     && result.getStaleness() <= MAX_FRAME_AGE_MS
                     && result.getControlHubTimeStamp() != lastFrameStamp) {
@@ -120,9 +131,10 @@ public class Limelight extends SubsystemIF {
 
         telemetry.addLine();
         if (error != null) telemetry.addData("Limelight", error);
+        telemetry.addData("LL RAW", raw + " | alliance " + Alliance.getCurrent());
         telemetry.addData("LL Target Source", tracker.source(now));
         telemetry.addData("LL Up Cell", tracker.cellName(tracker.getCurrentUpCell())
-                + (tracker.getLastUsedRange() ? " (3D)" : " (angle only)"));
+                + (SIMPLE_TRACKING ? " (simple)" : tracker.getLastUsedRange() ? " (3D)" : " (angle only)"));
         telemetry.addData("LL Alliance Tags / Up Tags", tracker.getLastAllianceTags() + " / " + tracker.getLastUpTags());
         telemetry.addData("LL Note", tracker.getLastNote());
         telemetry.addData("LL Tag Heights (in)", tracker.getLastTagHeights()
