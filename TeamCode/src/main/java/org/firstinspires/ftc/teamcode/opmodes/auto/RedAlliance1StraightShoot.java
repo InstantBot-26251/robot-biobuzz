@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.AutoFactory;
 
 @Autonomous(name = "Red Alliance Straight Shoot-C,1")
 public class RedAlliance1StraightShoot extends AutoFactory {
-    private final Pose point1 = poseFactory.of(55.8195, 32.2098, 90);
+    private final Pose point1 = poseFactory.of(55.8195, -23, 90);
 
     @Override
     protected Alliance getAlliance() {
@@ -21,12 +21,13 @@ public class RedAlliance1StraightShoot extends AutoFactory {
 
     @Override
     protected Pose setStartPose() {
-        return poseFactory.of(55.842, 9.0242, 90);
+        return poseFactory.of(55.842, -9.0242, 90);
     }
 
     private Path path1() {
         return Paths.line(startPose, point1).linear(startPose, point1);
     }
+
 
     @Override
     protected Command createAutoSequence() {
