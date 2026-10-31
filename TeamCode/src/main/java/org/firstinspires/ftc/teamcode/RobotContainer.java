@@ -17,8 +17,6 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.depollinator.Depollinator;
-import org.firstinspires.ftc.teamcode.depollinator.DepollinatorCommands;
 import org.firstinspires.ftc.teamcode.intake.Intake;
 import org.firstinspires.ftc.teamcode.intake.IntakeCommands;
 import org.firstinspires.ftc.teamcode.opmodes.auto.AutoConstants;
@@ -42,7 +40,6 @@ public class RobotContainer extends Robot {
     private final Shooter shooter;
     private final Intake intake;
 
-    private final Depollinator depollinator;
     private final Vision vision;
 
     private HardwareMap hardwareMap;
@@ -68,13 +65,12 @@ public class RobotContainer extends Robot {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
-        chassis = new Chassis(telemetry, hardwareMap);
-        shooter = new Shooter(telemetry, hardwareMap);
-        intake = new Intake(telemetry, hardwareMap);
-        depollinator = new Depollinator(telemetry, hardwareMap);
-        vision = new Vision(telemetry, hardwareMap);
+        chassis = new Chassis(this.telemetry, hardwareMap);
+        shooter = new Shooter(this.telemetry, hardwareMap);
+        intake = new Intake(this.telemetry, hardwareMap);
+        vision = new Vision(this.telemetry, hardwareMap);
 
-        subsystems.addAll(List.of(chassis, intake, shooter, depollinator, vision));
+        subsystems.addAll(List.of(chassis, intake, shooter, vision));
 
         for(Subsystem s : subsystems) {
             register(s);
@@ -120,9 +116,6 @@ public class RobotContainer extends Robot {
         gamepad2.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(IntakeCommands.intake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
-        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(DepollinatorCommands.depollinate(depollinator))
-                .whenReleased(DepollinatorCommands.restDepollinator(depollinator));
         gamepad2.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(IntakeCommands.outtake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));

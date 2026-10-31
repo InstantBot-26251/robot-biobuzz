@@ -7,11 +7,11 @@ public class VisionConstants {
     public static int RED_PIPELINE = 0;
     public static int BLUE_PIPELINE = 1;
 
-    public static double CAMERA_HEIGHT_IN = 10.0;
-    public static double CAMERA_PITCH_DEG = 50.0;
-    public static double CAMERA_FORWARD_OF_SHOOTER_IN = 0.0;
+    public static double CAMERA_HEIGHT_IN = 9.4;
+    public static double CAMERA_PITCH_DEG = 16.0;
+    public static double CAMERA_FORWARD_OF_SHOOTER_IN = -6.0;
 
-    public static double UP_CELL_MIN_TAG_HEIGHT_IN = 26.0;
+    public static double UP_CELL_MIN_TAG_HEIGHT_IN = 50;
 
     public static double AIM_POINT_CLOSER_THAN_TAGS_IN = 6.0;
 
@@ -23,8 +23,8 @@ public class VisionConstants {
 
     public static double LONG_SHOT_TRIM = 0.0;
 
-    public static double LAUNCH_ANGLE_DEG = 20.0;
-    public static double LAUNCH_HEIGHT_IN = 12.0;
+    public static double LAUNCH_ANGLE_DEG = 75;
+    public static double LAUNCH_HEIGHT_IN = 5;
     public static double HIVE_OPENING_HEIGHT_IN = 40.0;
 
     public static boolean AUTO_SPIN_UP = false;
