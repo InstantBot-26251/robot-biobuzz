@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
+
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -8,14 +11,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
-import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
-public class Shooter extends SubsystemIF {
 
+public class Shooter extends SubsystemIF {
 
     private final Telemetry telemetry;
     private final  HardwareMap hardwareMap;
@@ -24,6 +23,7 @@ public class Shooter extends SubsystemIF {
     private CRServo rightIntakeServo;
     private CRServo leftIntakeServo;
     private final PIDFController shooterPID;
+
 
     public Shooter(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
@@ -68,10 +68,6 @@ public class Shooter extends SubsystemIF {
         leftIntakeServo.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
-    public void enableShooter() {
-        shooterPID.setSetPoint(toTicksPerSec(SHOOTER_VELOCITY));
-    }
-
     public void startUpServos() {
         rightIntakeServo.setPower(0.75);
         leftIntakeServo.setPower(0.75);
@@ -99,6 +95,7 @@ public class Shooter extends SubsystemIF {
 
     @Override
     public void periodic() {
+        shooterPID.setPIDF(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F); // TODO: delete once the PID is tuned
 
         double velocity = getShooterVelocity();
         double output = 0;
