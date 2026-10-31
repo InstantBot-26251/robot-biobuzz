@@ -28,7 +28,7 @@ public class ShooterConstants {
     public static double SHOOTER_VELOCITY_TOLERANCE = 100;
     public static long READY_STABLE_MS = 60;
     public static boolean GATE_FEED_ON_SPEED = true;
-    public static long FEED_GATE_TIMEOUT_MS = 1500;
+    public static long FEED_GATE_TIMEOUT_MS = 1000;
 
     public static VelocitySource VELOCITY_SOURCE = VelocitySource.AVERAGE;
     public static double VELOCITY_FILTER = 0.3;

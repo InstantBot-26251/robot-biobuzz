@@ -94,8 +94,8 @@ public class Shooter extends SubsystemIF {
     }
 
     public void setUpMotors() {
-        rightShooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
-        leftShooterMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        rightShooterMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        leftShooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
 
         rightShooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftShooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -115,8 +115,8 @@ public class Shooter extends SubsystemIF {
     }
 
     public void setUpServos() {
-        rightIntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftIntakeServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightIntakeServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftIntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void setFeedPermission(BooleanSupplier feedPermission) {

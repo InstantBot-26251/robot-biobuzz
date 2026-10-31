@@ -51,6 +51,7 @@ public class HiveTracker {
     private int lastUpTags = 0;
     private boolean lastUsedRange = false;
     private String lastNote = "-";
+    private String lastTagHeights = "-";
 
     public void reset(Alliance alliance, boolean fieldLocalized) {
         this.alliance = alliance;
@@ -128,6 +129,10 @@ public class HiveTracker {
         return lastNote;
     }
 
+    public String getLastTagHeights() {
+        return lastTagHeights;
+    }
+
     public static void forgetLearnedAxes() {
         for (int i = 0; i < CELL_AXIS.length; i++) CELL_AXIS[i] = null;
     }
@@ -151,6 +156,7 @@ public class HiveTracker {
 
     public void update(List<Tag> tags, Pose capturePose, double nowMs) {
         List<Sighting> ours = new ArrayList<>();
+        StringBuilder heights = new StringBuilder();
         for (Tag tag : tags) {
             if (!alliance.ownsTag(tag.id)) continue;
             Sighting s = new Sighting();
@@ -159,11 +165,15 @@ public class HiveTracker {
             s.tx = tag.tx;
             s.ty = tag.ty;
             s.elevation = TargetMath.elevation(tag.ty, CAMERA_PITCH_DEG);
-            s.height = (!Double.isNaN(tag.range) && tag.range > 1.0)
+            double measured = (!Double.isNaN(tag.range) && tag.range > 1.0)
                     ? TargetMath.heightFromRange(tag.tx, tag.ty, tag.range, CAMERA_HEIGHT_IN, CAMERA_PITCH_DEG)
                     : Double.NaN;
+            s.height = USE_TAG_RANGE ? measured : Double.NaN;
+            heights.append(heights.length() == 0 ? "" : ", ")
+                    .append(tag.id).append("=").append(String.format("%.1f", measured));
             ours.add(s);
         }
+        lastTagHeights = heights.length() == 0 ? "-" : heights.toString();
         lastAllianceTags = ours.size();
         lastUpTags = 0;
         if (ours.isEmpty()) return;

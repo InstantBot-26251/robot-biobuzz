@@ -125,6 +125,8 @@ public class Limelight extends SubsystemIF {
                 + (tracker.getLastUsedRange() ? " (3D)" : " (angle only)"));
         telemetry.addData("LL Alliance Tags / Up Tags", tracker.getLastAllianceTags() + " / " + tracker.getLastUpTags());
         telemetry.addData("LL Note", tracker.getLastNote());
+        telemetry.addData("LL Tag Heights (in)", tracker.getLastTagHeights()
+                + (USE_TAG_RANGE ? "" : " (ignored: USE_TAG_RANGE off)"));
         telemetry.addData("LL Distance (in)", getDistance(pose));
         telemetry.addData("LL Aim Error (deg)", getAimErrorDeg(pose));
         telemetry.addData("LL Latency (ms)", lastLatencyMs);

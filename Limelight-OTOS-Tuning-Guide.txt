@@ -1,0 +1,270 @@
+LIMELIGHT & OTOS TUNING GUIDE
+Branch: 55-fix-limelight-code (InstantBot-26251/robot-biobuzz)
+As of Oct 31, 2026
+
+======================================================================
+1. HOW IT FITS TOGETHER
+======================================================================
+
+The OTOS is the only source of robot pose; the Limelight never corrects it.
+The Limelight finds the hive's up cell, and the code turns that sighting
+into a fixed field point using the OTOS pose. So every OTOS error becomes
+an aim and distance error. Tune the OTOS first, then the camera.
+
+What happens each loop:
+
+1. Chassis.periodic() updates the Pedro follower (OTOS localizer) and
+   stores the pose in a 64-sample history.
+2. Limelight.periodic() takes the newest frame if it is valid, newer than
+   the last one, and under MAX_FRAME_AGE_MS old.
+3. It looks up the pose at the moment the frame was captured
+   (chassis.poseAt(now - latency)).
+4. HiveTracker keeps only your alliance's tags (red 30-37, blue 38-45),
+   decides which cell is up, projects each up-cell tag onto the floor plane
+   with TargetMath, and converts it to field coordinates.
+5. The tag points are collapsed to the cell center, then median-filtered
+   over the last FILTER_SAMPLES frames.
+6. Aim heading and distance are computed from the current OTOS pose to that
+   field point. The shooter's RPM table uses that distance.
+
+File                                     What you tune there
+---------------------------------------  ---------------------------------------------
+pedro/Constants.java -> localizerConfig  OTOS linear scalar, angular scalar, offset + mount angle
+opmodes/tuning/OTOSCalibration.java      The OpMode that measures those values
+opmodes/tuning/DriveCheck.java           Quick check that motors and OTOS axes are right
+vision/VisionConstants.java              Camera pose, tag heights, filters, field map
+chassis/DriveConstants.java              Aim PD, tolerances, runaway guard
+opmodes/tuning/ShotTuner.java            Distance -> RPM table, uses Limelight distance
+
+VisionConstants and DriveConstants are @Configurable, so you can change them
+live from the Panels dashboard. Live edits are lost on restart: copy final
+values back into the Java file.
+
+======================================================================
+2. OTOS CALIBRATION
+======================================================================
+
+Run the "OTOS Calibration" OpMode (TeleOp, group Setup) and paste its three
+output lines into localizerConfig in pedro/Constants.java. It measures
+everything; you only drive and press A.
+
+Before you start, fix the hardware. Software cannot fix these:
+
+- Peel the clear protective film off the sensor.
+- Mount it facing the floor, about 10 mm (0.4 in) above the tiles. Too high
+  is the usual cause of autos driving forever.
+- Clean the lens.
+- The device must be named "otos" in the robot configuration.
+
+The five steps (A starts and ends each one; the gyro recalibrates at the
+start of each, so keep still):
+
+1. Angular scalar - spin SPIN_TURNS (default 5) full turns
+   counter-clockwise with the right stick, stop exactly where you started.
+2. Linear scalar + mount angle - line up on a tile seam, push the robot
+   straight forward exactly PUSH_DISTANCE_IN (default 48 in) without
+   turning. Measure with a tape, not by eye.
+3. Offset spin #1 - turn about 180 degrees in place.
+4. Offset spin #2 - turn about 180 degrees again (skipped if the sensor is
+   within 0.3 in of center).
+5. Verify - turn in place a few times. Max drift should stay under ~1 in.
+
+The OpMode then prints the values to copy:
+
+    c.linearScalar.set(...);
+    c.angularScalar.set(...);
+    c.offset.set(new Pose(x, y, mountHeading));
+
+Keep all three arguments of the offset. The branch's current config is
+new Pose(0.7749542476624016, 1.8863227423720472), which drops the mount
+heading. If the OTOS is not mounted exactly straight, forward pushes will
+read partly as sideways motion.
+
+The branch also has c.linearScalar.set(.9), a round number that looks
+hand-set. Re-measure it with the OpMode.
+
+Warning from the OpMode               Meaning                     Fix
+------------------------------------  --------------------------  ---------------------------------------------
+Scalar outside 0.872-1.127            The chip rejects it         Re-measure; if linear repeats, fix sensor height
+Under 5 in measured for the push      Sensor can't see the floor  Film, height, lens
+Linear scalar > 1.5                   Losing tracking             Sensor too high or film still on
+Heading went down while turning CCW   Mounted upside down         Flip it to face the floor
+Verify drift > 2 in                   Offset is off               Spin slower and more in place, rerun
+
+After pasting, run "Drive Check". Press A to zero, push forward 24 in: X
+should read about +24. Push left: Y goes up. Turn CCW: heading goes up.
+
+======================================================================
+3. LIMELIGHT SETUP
+======================================================================
+
+The code gets distance mainly from the tag's vertical angle and known
+heights, so the camera height and pitch matter most. MegaTag / botpose is
+not used.
+
+In the Limelight web UI:
+
+- Pipeline index must match APRILTAG_PIPELINE (default 0) and be an
+  AprilTag (fiducial) pipeline, 36h11 family.
+- Set the tag size correctly. It drives the 3D range used to tell the up
+  cell from the down cell. Wrong size = wrong cell.
+- Prefer low exposure and a high frame rate to reduce blur while turning.
+- The device must be named "limelight" (LIMELIGHT_NAME) in the robot
+  configuration.
+
+Camera pose constants (VisionConstants, robot frame: +forward, +left,
+measured from the robot center the OTOS offset defines):
+
+Constant            Default  How to set it
+------------------  -------  ------------------------------------------------------
+CAMERA_HEIGHT_IN    10.0     Tape-measure floor to lens center
+CAMERA_PITCH_DEG    32.0     Positive = tilted up. Start from CAD or a phone level, then tune (below)
+CAMERA_FORWARD_IN   0.0      Lens ahead of robot center (negative = behind)
+CAMERA_LEFT_IN      0.0      Lens left of robot center (negative = right)
+CAMERA_YAW_DEG      0.0      Positive = camera turned left (CCW)
+
+Field constants. Only change these if the field differs from the game
+manual. Coordinates are Pedro inches on a 144 x 144 field.
+
+Constant                                       Default        Meaning
+---------------------------------------------  -------------  ------------------------------------------
+UP_CELL_TAG_HEIGHT_IN                          49.9           Tag center height on the up cell
+DOWN_CELL_TAG_HEIGHT_IN                        35.6           Tag center height on the down cell
+HIVE_CENTER_X_IN                               72             Hive center X
+RED_HIVE_Y_IN / BLUE_HIVE_Y_IN                 59.25 / 84.75  Hive Y per alliance
+UP_CELL_TAG_OFFSET_IN / DOWN_CELL_TAG_OFFSET_IN  13.04 / 11.68  Cell center distance from hive center in X
+ASSUMED_UP_CELL_AT_START                       0              Which cell is up when the match starts
+
+Telemetry "LL Up Cell" shows (3D) when the tag-size range is working and
+(angle only) when it isn't. If it stays on angle only, fix the tag size in
+the web UI first.
+
+======================================================================
+4. FILTERING, MEMORY AND THE FIELD MAP
+======================================================================
+
+There are no Kalman standard deviations to tune: vision locates the
+target, it does not adjust the pose. The knobs below trade steadiness
+against lag, and decide how long to trust an old sighting.
+
+Constant           Default  Raise it when                                Lower it when
+-----------------  -------  -------------------------------------------  ----------------------------------------
+FILTER_SAMPLES     5        Target point jitters while parked            Aim lags after the cell switches
+FILTER_WINDOW_MS   600      Few frames arrive (low FPS)                  Old samples drag the target
+MAX_FRAME_AGE_MS   150      Valid frames are being dropped               Aim jumps while turning fast
+TARGET_MEMORY_MS   4000     Tags drop out often when close               OTOS drift makes remembered aim wrong
+MAP_AGREE_IN       12       Map never shows "confirmed" on a good robot  You want a stricter check
+MAP_REJECT_IN      20       Map gets rejected on a good robot            Bad maps survive too long
+MAP_REJECT_COUNT   5        One-off bad frames reject the map            Rejection is too slow
+
+Target source order is LIVE (seen in the last 250 ms) -> MEMORY (seen
+within TARGET_MEMORY_MS) -> MAP -> NONE. Watch "LL Target Source".
+
+The field map (USE_FIELD_MAP) is a fallback target from the hive
+coordinates. It is only used when the pose came from auto
+(POSE_FROM_AUTO), so it is off in a teleop started cold. The camera checks
+it every frame: "LL Field Map" shows "confirmed (X in off)" when they agree.
+
+That "X in off" number is your best single health check of OTOS plus
+camera together. On a well-tuned robot after auto it should stay well
+under 12 in.
+
+Latency is compensated automatically: the capture pose is taken from the
+64-sample pose history at now - (staleness + capture + targeting latency).
+Check "LL Latency (ms)"; under ~50 ms is normal.
+
+======================================================================
+5. TUNING PROCEDURE
+======================================================================
+
+Do these in order; each step assumes the ones before it are right. Use
+Panels for live edits, then copy final values into the Java files.
+
+[ ] Drive Check. Motors spin the right way; turn and d-pad tests pass.
+[ ] OTOS hardware. Film off, ~10 mm height, lens clean.
+[ ] OTOS Calibration. Paste all three lines, including the mount heading
+    in the offset. Rebuild and deploy.
+[ ] Verify OTOS. Drive Check: 24 in push reads X ~ 24. Drive a 4-tile
+    square and return to the start mark: error under ~1 in and ~2 degrees.
+[ ] Limelight web UI. AprilTag pipeline at index 0, tag size set,
+    exposure low.
+[ ] Measure the camera. Height, forward, left with a tape; pitch from CAD
+    or a level.
+[ ] Tune pitch. See below.
+[ ] Tune yaw / left offset. See below.
+[ ] Check up-cell detection. "LL Up Cell" names the right cell and shows (3D).
+[ ] Run an auto, then teleop. "LL Field Map" says "confirmed" with a small
+    error.
+[ ] Shot Tuner. Only now build the distance -> RPM table, because it uses
+    Limelight distance.
+
+Tuning pitch (distance). Park the robot facing the up cell at three
+tape-measured distances, e.g. 36, 60 and 90 in, measured from robot center
+to the floor point under the cell center. Compare with "LL Distance (in)".
+
+- Reads SHORT, worse when far -> lower CAMERA_PITCH_DEG by 0.5-1 degree.
+- Reads LONG, worse when far -> raise CAMERA_PITCH_DEG.
+- Off by the same percentage at every distance -> recheck CAMERA_HEIGHT_IN
+  (set too low reads long) and the tag heights.
+- Aim for under 2 in error at every distance.
+
+Tuning yaw and lateral offset (aim). Hold aim, let it settle ("Aim
+Locked"), and check where the robot really points with a laser or string
+line.
+
+- Off by the SAME ANGLE at all distances -> adjust CAMERA_YAW_DEG (robot
+  points right of target -> the camera is actually turned more left than
+  set, so increase it).
+- Off MORE WHEN CLOSE than far -> adjust CAMERA_LEFT_IN or
+  CAMERA_FORWARD_IN.
+- Verify the result by shooting: shots land centered from the near, middle
+  and far spots.
+
+======================================================================
+6. TROUBLESHOOTING
+======================================================================
+
+Symptom (telemetry)
+  Likely cause -> Fix
+
+"LOCALIZATION FAULT ... almost no motion"
+  OTOS can't see the floor -> Film, height (~10 mm), lens; then recalibrate
+
+"LOCALIZATION FAULT ... WRONG direction"
+  Mount angle missing or wrong -> Rerun OTOS Calibration; keep the 3rd Pose argument
+
+Pose drifts sideways on straight drives
+  Mount heading dropped from offset -> Same as above
+
+Aim drifts while turning in place
+  OTOS offset wrong -> Redo calibration steps 3-5
+
+"Limelight: No device named ..."
+  Config name mismatch -> Name it "limelight" or change LIMELIGHT_NAME
+
+"LL Alliance Tags / Up Tags" = 0 / 0
+  Wrong alliance or pipeline -> Set alliance in init (X blue, B red); check pipeline index
+
+"LL Up Cell" always (angle only)
+  No 3D pose from the Limelight -> Set tag size in the web UI
+
+"only the DOWN cell is visible"
+  Up cell out of frame -> Back up, or raise pitch if the camera is aimed too low
+
+Wrong cell chosen
+  Tag size or heights wrong -> Fix tag size; check the two height constants
+
+Distance off by a growing amount
+  Pitch wrong -> Tune CAMERA_PITCH_DEG
+
+Aim off by a fixed angle
+  Camera yaw wrong -> Tune CAMERA_YAW_DEG
+
+Aim jumps when spinning fast
+  Old frames or latency -> Lower MAX_FRAME_AGE_MS; check "LL Latency"
+
+"LL Field Map" "DISAGREES ... disabled"
+  OTOS pose after auto is off, or field constants wrong -> Check OTOS first; then the hive constants
+
+Field map "not used"
+  Teleop not started right after auto -> Expected; run auto first, or use ResetRobot to start clean
