@@ -23,6 +23,7 @@ public class VisionConstants {
     public static long FILTER_WINDOW_MS = 600;
     public static long TARGET_MEMORY_MS = 4000;
     public static long MAX_FRAME_AGE_MS = 500;
+    public static long MAX_FRAME_AGE_MS = 150;
 
     public static boolean USE_FIELD_MAP = false;
     public static double HIVE_CENTER_X_IN = 72;
