@@ -102,10 +102,6 @@ public class ShotTuner extends OpMode {
                 showStatus(String.format(Locale.US, "SAVED point %d: %.1f in -> %.0f RPM (kept after restart)",
                         points.size(), distance, tunerRpm));
                 gamepad1.rumbleBlips(2);
-                t.addLine("!! Can't save: Limelight doesn't see your hive");
-            } else {
-                points.add(new double[]{distance, tunerRpm});
-                applyTable();
             }
         }
         if (back && !pBack && !points.isEmpty()) {
@@ -119,9 +115,6 @@ public class ShotTuner extends OpMode {
         t.addLine("===== SHOT TUNER =====");
         if (!status.isEmpty() && statusTimer.seconds() < 4) t.addLine(">> " + status);
         t.addLine("A spin | B stop | dpad +/-50 +/-250 | RB shoot | Y save | BACK undo");
-        robot.periodic();
-
-        t.addLine("===== SHOT TUNER =====");
         t.addData("Tuner RPM", tunerRpm);
         t.addData("Limelight distance (in)", distance);
         t.addData("RPM the table would pick", ShooterConstants.SHOT_RPMS.length == 0 ? Double.NaN :
@@ -146,9 +139,6 @@ public class ShotTuner extends OpMode {
         t.addLine("===== END SHOT TUNER =====");
 
         robot.periodic();
-        t.addLine("Saved points (paste into ShooterConstants):");
-        t.addLine(tableString());
-        t.update();
     }
 
     private void applyTable() {
@@ -163,20 +153,6 @@ public class ShotTuner extends OpMode {
         ShooterConstants.SHOT_DISTANCES_IN = d;
         ShooterConstants.SHOT_RPMS = r;
         if (!ShotTableStore.save(d, r)) showStatus("!! Could not write " + ShotTableStore.path());
-    }
-
-    private String tableString() {
-        StringBuilder ds = new StringBuilder("SHOT_DISTANCES_IN = {");
-        StringBuilder rs = new StringBuilder("SHOT_RPMS = {");
-        for (int i = 0; i < ShooterConstants.SHOT_DISTANCES_IN.length; i++) {
-            if (i > 0) {
-                ds.append(", ");
-                rs.append(", ");
-            }
-            ds.append(String.format(Locale.US, "%.1f", ShooterConstants.SHOT_DISTANCES_IN[i]));
-            rs.append(String.format(Locale.US, "%.0f", ShooterConstants.SHOT_RPMS[i]));
-        }
-        return ds.append("};\n").append(rs.append("};")).toString();
     }
 
     @Override

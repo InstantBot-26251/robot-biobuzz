@@ -246,14 +246,6 @@ public class Shooter extends SubsystemIF {
         targetRpm = computeTarget();
         double power = 0;
 
-
-        double raw = readRpm();
-        double alpha = Math.max(0, Math.min(0.95, VELOCITY_FILTER));
-        measuredRpm = alpha * measuredRpm + (1 - alpha) * raw;
-
-        targetRpm = computeTarget();
-        double power = 0;
-
         if (mode == Mode.OPEN_LOOP) {
             if (voltageTimer.milliseconds() > 250) {
                 voltage = voltageSensor.getVoltage();
@@ -313,29 +305,6 @@ public class Shooter extends SubsystemIF {
         rightIntakeServo.setPower(servoPower);
         leftIntakeServo.setPower(servoPower);
 
-        setBrake(mode == Mode.OFF);
-
-        rightShooterMotor.setPower(power);
-        leftShooterMotor.setPower(power);
-        lastPower = power;
-
-        boolean nowInTolerance = targetRpm > 0 && Math.abs(targetRpm - measuredRpm) <= SHOOTER_VELOCITY_TOLERANCE;
-        if (nowInTolerance && !inTolerance) inToleranceTimer.reset();
-        inTolerance = nowInTolerance;
-
-        if (!feedRequested || mode == Mode.OFF) {
-            feeding = false;
-        } else if (!GATE_FEED_ON_SPEED || feedRequestTimer.milliseconds() > FEED_GATE_TIMEOUT_MS) {
-            feeding = true;
-        } else if (atTargetVelocity() && feedPermission.getAsBoolean()) {
-            feeding = true;
-        } else if (targetRpm - measuredRpm > 2 * SHOOTER_VELOCITY_TOLERANCE || !feedPermission.getAsBoolean()) {
-            feeding = false;
-        }
-        double servoPower = feeding ? SERVO_POWER : 0;
-        rightIntakeServo.setPower(servoPower);
-        leftIntakeServo.setPower(servoPower);
-
         telemetry.addLine();
         telemetry.addData("Shooter Mode", mode + (mode == Mode.AUTO ? (usingDistance ? " (Limelight)" : " (DEFAULT_RPM)") : ""));
         StringBuilder table = new StringBuilder();
@@ -345,8 +314,6 @@ public class Shooter extends SubsystemIF {
         }
         telemetry.addData("Shot Table", (table.length() == 0 ? "EMPTY" : table.toString())
                 + (loadedShotPoints > 0 ? " (from Shot Tuner file)" : " (from ShooterConstants)"));
-        telemetry.addLine();
-        telemetry.addData("Shooter Mode", mode + (mode == Mode.AUTO ? (usingDistance ? " (Limelight)" : " (DEFAULT_RPM)") : ""));
         telemetry.addData("Shooter Target RPM", targetRpm);
         telemetry.addData("Shooter RPM", measuredRpm);
         telemetry.addData("Shooter Power", power);

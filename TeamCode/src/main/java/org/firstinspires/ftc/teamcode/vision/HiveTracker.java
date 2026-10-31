@@ -245,12 +245,6 @@ public class HiveTracker {
             if (s.cell != cell) continue;
             if (!Double.isNaN(s.height) && s.height < minHeight) continue;
             double[] robotPoint = TargetMath.targetInRobotFrame(s.tx, s.ty, tagHeight,
-
-        List<double[]> points = new ArrayList<>();
-        for (Sighting s : ours) {
-            if (s.cell != upCell) continue;
-            if (!Double.isNaN(s.height) && s.height < split) continue;
-            double[] robotPoint = TargetMath.targetInRobotFrame(s.tx, s.ty, UP_CELL_TAG_HEIGHT_IN,
                     CAMERA_HEIGHT_IN, CAMERA_PITCH_DEG, CAMERA_YAW_DEG, CAMERA_FORWARD_IN, CAMERA_LEFT_IN);
             if (robotPoint == null) continue;
             double[] field = TargetMath.robotToField(robotPoint, capturePose.x(), capturePose.y(), capturePose.heading());
@@ -274,20 +268,6 @@ public class HiveTracker {
         double[] center = clusterCenter(points, cell);
         if (!SIMPLE_TRACKING) checkAgainstMap(center, cell);
         lastNote = cellName(cell) + label;
-        lastUpTags = points.size();
-        if (points.isEmpty()) {
-            lastNote = "up cell seen but tags unusable";
-            return;
-        }
-
-        boolean axisKnown = CELL_AXIS[axisIndex(upCell)] != null;
-        if (points.size() == 1 && !axisKnown && (nowMs - lastSeenMs < TARGET_MEMORY_MS || mapUsable())) {
-            lastNote = cellName(upCell) + " UP (1 tag, kept previous fix)";
-            return;
-        }
-        double[] center = clusterCenter(points, upCell);
-        checkAgainstMap(center, upCell);
-        lastNote = cellName(upCell) + " UP";
 
         sampleX[sampleHead] = center[0];
         sampleY[sampleHead] = center[1];
