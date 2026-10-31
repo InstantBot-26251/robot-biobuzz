@@ -59,9 +59,9 @@ public class Constants {
 
     public static OTOSConfig localizerConfig = new OTOSConfig(c -> {
         c.name.set("otos");
-        c.linearScalar.set(190.24164571428568);
+        c.linearScalar.set(.9);
         c.angularScalar.set(0.9839058371366785);
-        c.offset.set(new Pose(-0.7749542476624016, -1.8863227423720472));
+        c.offset.set(new Pose(0.7749542476624016, 1.8863227423720472));
         c.linearUnit.set(DistanceUnit.INCH);
     });
 
