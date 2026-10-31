@@ -24,10 +24,12 @@ import org.firstinspires.ftc.teamcode.intake.IntakeCommands;
 import org.firstinspires.ftc.teamcode.opmodes.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
+import org.firstinspires.ftc.teamcode.chassis.DriveConstants;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.shooter.ShooterCommands;
+import org.firstinspires.ftc.teamcode.util.PanelsDrawing;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
-
+import org.firstinspires.ftc.teamcode.vision.Limelight;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,7 @@ public class RobotContainer extends Robot {
     private final ElapsedTime timer = new ElapsedTime();
     private final List<LynxModule> hubs;
     private final Chassis chassis;
+    private final Limelight limelight;
     private final Shooter shooter;
     private final Intake intake;
 
@@ -47,9 +50,13 @@ public class RobotContainer extends Robot {
     private Telemetry telemetry;
     private GamepadEx gamepad1;
     private GamepadEx gamepad2;
+    private final Gamepad rawGamepad1;
+    private final Gamepad rawGamepad2;
+    private boolean teleop = false;
+    private boolean wasShooterReady = false;
+    private boolean wasAimLocked = false;
 
     public RobotContainer(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
-
         reset();
 
         this.hardwareMap = hardwareMap;
@@ -59,7 +66,9 @@ public class RobotContainer extends Robot {
         );
         this.gamepad1 = new GamepadEx(gamepad1);
         this.gamepad2 = new GamepadEx(gamepad2);
-
+        this.rawGamepad1 = gamepad1;
+        this.rawGamepad2 = gamepad2;
+        PanelsDrawing.init();
 
         hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : hubs) {
@@ -67,11 +76,14 @@ public class RobotContainer extends Robot {
         }
 
         chassis = new Chassis(this.telemetry, hardwareMap);
+        limelight = new Limelight(this.telemetry, hardwareMap, chassis);
         shooter = new Shooter(this.telemetry, hardwareMap);
         intake = new Intake(this.telemetry, hardwareMap);
         depollinator = new Depollinator(this.telemetry, hardwareMap);
 
-        subsystems.addAll(List.of(chassis, intake, shooter, depollinator));
+        shooter.setDistanceSupplier(() -> limelight.getDistance(chassis.getPose()));
+
+        subsystems.addAll(List.of(chassis, limelight, intake, shooter, depollinator));
 
         for(Subsystem s : subsystems) {
             register(s);
@@ -96,11 +108,17 @@ public class RobotContainer extends Robot {
             s.teleopInit();
         }
 
+        teleop = true;
+
         chassis.setDefaultCommand(ChassisCommands.createTeleopDriveCommand(
                 chassis,
-                () -> gamepad1.getLeftY(),
-                () -> -gamepad1.getLeftX(),
-                () -> -gamepad1.getRightX()));
+                limelight,
+                () -> gamepad1.getLeftY() * driveScale(),
+                () -> -gamepad1.getLeftX() * driveScale(),
+                () -> -gamepad1.getRightX() * turnScale(),
+                this::aimHeld));
+
+        shooter.setFeedPermission(() -> !aimHeld() || aimLocked());
 
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
@@ -109,6 +127,9 @@ public class RobotContainer extends Robot {
         gamepad2.getGamepadButton(GamepadKeys.Button.Y).whenPressed(ShooterCommands.disableShooter(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.shoot(shooter))
                 .whenReleased(ShooterCommands.disableShooterServo(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(ShooterCommands.trimUp(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(ShooterCommands.trimDown(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(ShooterCommands.resetTrim(shooter));
 
         gamepad2.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(IntakeCommands.intake(intake))
@@ -121,8 +142,41 @@ public class RobotContainer extends Robot {
                 .whenReleased(IntakeCommands.stopIntake(intake));
     }
 
+    private boolean aimHeld() {
+        return gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3;
+    }
+
+    private boolean slowHeld() {
+        return gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.3;
+    }
+
+    private double driveScale() {
+        return slowHeld() ? DriveConstants.SLOW_MODE_DRIVE_SCALE : 1.0;
+    }
+
+    private double turnScale() {
+        return slowHeld() ? DriveConstants.SLOW_MODE_TURN_SCALE : 1.0;
+    }
+
+    public boolean aimLocked() {
+        double error = limelight.getAimErrorDeg(chassis.getPose());
+        return !Double.isNaN(error) && Math.abs(error) <= DriveConstants.AIM_FEED_TOLERANCE_DEG;
+    }
+
+    private void rumbleFeedback() {
+        boolean ready = shooter.atTargetVelocity();
+        boolean locked = aimHeld() && aimLocked();
+        if (DriveConstants.RUMBLE_FEEDBACK) {
+            if (ready && !wasShooterReady) rawGamepad2.rumble(200);
+            if (locked && !wasAimLocked) rawGamepad1.rumble(150);
+        }
+        wasShooterReady = ready;
+        wasAimLocked = locked;
+    }
+
     public void stop() {
         ROBOT_POSE = chassis.getPose();
+        limelight.stop();
     }
 
     public void setPose(Pose pose) {
@@ -141,9 +195,17 @@ public class RobotContainer extends Robot {
         return ShooterCommands.enableShooter(shooter);
     }
 
-    public Command shootFor(long shootTime) {
+    public Command aim() {
+        return ChassisCommands.createAimCommand(chassis, limelight);
+    }
+
+    public Command aimAndShoot(long shootTime) {
         return Commands.sequence(
                 ShooterCommands.enableShooter(shooter),
+                Commands.race(
+                        Commands.waitUntil(limelight::hasTarget),
+                        Commands.waitMillis(AutoConstants.TARGET_WAIT_TIME)),
+                aim(),
                 Commands.race(
                         Commands.waitUntil(shooter::atTargetVelocity),
                         Commands.waitMillis(AutoConstants.MAX_SPIN_UP_TIME)),
@@ -152,17 +214,52 @@ public class RobotContainer extends Robot {
                 ShooterCommands.disableShooter(shooter));
     }
 
+    public Command shootFor(long shootTime) {
+        return aimAndShoot(shootTime);
+    }
+
+    public Chassis getChassis() {
+        return chassis;
+    }
+
+    public Limelight getLimelight() {
+        return limelight;
+    }
+
+    public Shooter getShooter() {
+        return shooter;
+    }
+
+    public Telemetry getTelemetry() {
+        return telemetry;
+    }
+
+    public void initLoop() {
+        for (LynxModule hub : hubs) {
+            hub.clearBulkCache();
+        }
+        chassis.periodic();
+        limelight.periodic();
+        PanelsDrawing.update();
+        telemetry.update();
+    }
+
     public void periodic() {
         for (LynxModule hub : hubs) {
             hub.clearBulkCache();
         }
 
         run();
+        if (teleop) rumbleFeedback();
 
+        PanelsDrawing.update();
         telemetry.addLine();
+        if (teleop) {
+            telemetry.addData("Aim Locked", aimLocked());
+            telemetry.addData("Slow Mode", slowHeld());
+        }
         telemetry.addData("Loop Time", timer.milliseconds());
         telemetry.update();
         timer.reset();
-
     }
 }

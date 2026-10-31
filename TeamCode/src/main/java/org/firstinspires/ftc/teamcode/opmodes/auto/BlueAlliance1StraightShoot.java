@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.Commands;
 
-import org.firstinspires.ftc.teamcode.util.Alliance;
+import org.firstinspires.ftc.teamcode.opmodes.Alliance;
 import org.firstinspires.ftc.teamcode.util.AutoFactory;
 
 @Autonomous(name = "Blue Alliance Straight Shoot-D,6")
@@ -33,7 +33,7 @@ public class BlueAlliance1StraightShoot extends AutoFactory {
         return Commands.sequence(
                 robot.enableShooter(),
                 robot.followPath(path1()),
-                robot.shootFor(AutoConstants.SHOOT_TIME)
+                robot.aimAndShoot(AutoConstants.SHOOT_TIME)
         );
     }
 }

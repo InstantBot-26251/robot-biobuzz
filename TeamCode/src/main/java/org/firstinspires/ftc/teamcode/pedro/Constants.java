@@ -33,27 +33,37 @@ public class Constants {
         );
     }
 
+    public static final boolean MOTORS_MIRRORED_LEFT_RIGHT = true;
+
+    private static void configureMotors(MecanumConfig c) {
+        if (MOTORS_MIRRORED_LEFT_RIGHT) {
+            c.frontLeftName.set("front_right");
+            c.frontRightName.set("front_left");
+            c.backLeftName.set("back_right");
+            c.backRightName.set("back_left");
+            c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+            c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
+            c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+            c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+        } else {
+            c.frontLeftName.set("front_left");
+            c.frontRightName.set("front_right");
+            c.backLeftName.set("back_left");
+            c.backRightName.set("back_right");
+            c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+            c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
+            c.backLeftDirection.set(DcMotorSimple.Direction.FORWARD);
+            c.backRightDirection.set(DcMotorSimple.Direction.REVERSE);
+        }
+    }
+
     public static MecanumConfig autonomousConfig = new MecanumConfig(c -> {
-        c.frontLeftName.set("front_left");
-        c.frontRightName.set("front_right");
-        c.backLeftName.set("back_left");
-        c.backRightName.set("back_right");
-        c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-        c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
-        c.backLeftDirection.set(DcMotorSimple.Direction.FORWARD);
-        c.backRightDirection.set(DcMotorSimple.Direction.REVERSE);
+        configureMotors(c);
         c.manualBrakeMode.set(false);
     });
 
     public static MecanumConfig teleOpConfig = new MecanumConfig(c -> {
-        c.frontLeftName.set("front_left");
-        c.frontRightName.set("front_right");
-        c.backLeftName.set("back_left");
-        c.backRightName.set("back_right");
-        c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-        c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
-        c.backLeftDirection.set(DcMotorSimple.Direction.FORWARD);
-        c.backRightDirection.set(DcMotorSimple.Direction.REVERSE);
+        configureMotors(c);
         c.manualBrakeMode.set(true);
     });
 
@@ -65,8 +75,6 @@ public class Constants {
         c.linearUnit.set(DistanceUnit.INCH);
     });
 
-    // TODO: actually tune foresight
-    // https://pedropathing.com/docs/pathing/tuning/foresight
     public static ForesightConfig foresightConfig = new ForesightConfig(
             c -> {
                 Controller primaryTranslationalForward = Controller.proportional(0.16147263595781208);
@@ -90,6 +98,6 @@ public class Constants {
                 c.maxAchievableStrafeVelocity.set(45.97460074823986);
                 c.naturalForwardDeceleration.set(49.350365188768514);
                 c.naturalStrafeDeceleration.set(65.13648242339649);
-                        }
-                );
+            }
+    );
 }

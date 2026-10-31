@@ -22,6 +22,6 @@ public class MotorTesting extends OpMode {
 
     @Override
     public void loop() {
-            motor.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+        motor.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
     }
 }
