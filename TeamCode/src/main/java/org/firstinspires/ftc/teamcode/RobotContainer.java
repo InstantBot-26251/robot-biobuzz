@@ -66,10 +66,10 @@ public class RobotContainer extends Robot {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
-        chassis = new Chassis(telemetry, hardwareMap);
-        shooter = new Shooter(telemetry, hardwareMap);
-        intake = new Intake(telemetry, hardwareMap);
-        depollinator = new Depollinator(telemetry, hardwareMap);
+        chassis = new Chassis(this.telemetry, hardwareMap);
+        shooter = new Shooter(this.telemetry, hardwareMap);
+        intake = new Intake(this.telemetry, hardwareMap);
+        depollinator = new Depollinator(this.telemetry, hardwareMap);
 
         subsystems.addAll(List.of(chassis, intake, shooter, depollinator));
 

@@ -11,9 +11,9 @@ public class IntakeConstants {
     public static double OUTTAKE_VELOCITY = -INTAKE_VELOCITY;
     public static double STOP_INTAKE_VELOCITY = 0;
 
-    public static double INTAKE_P = 1;
+    public static double INTAKE_P = 5;
     public static double INTAKE_I = 0;
-    public static double INTAKE_D = 0;
+    public static double INTAKE_D = 0.15;
     public static double INTAKE_F = 0;
 
     public static double toTicksPerSec(double rpm) {

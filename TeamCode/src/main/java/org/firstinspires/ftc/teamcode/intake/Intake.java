@@ -64,8 +64,6 @@ public class Intake extends SubsystemIF {
 
     @Override
     public void periodic() {
-        intakePID.setPIDF(IntakeConstants.INTAKE_P, IntakeConstants.INTAKE_I,
-                IntakeConstants.INTAKE_D, IntakeConstants.INTAKE_F);
 
         double velocity = getIntakeVelocity();
         double output = 0;

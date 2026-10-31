@@ -40,8 +40,8 @@ public class Constants {
         c.backRightName.set("back_right");
         c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
         c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
-        c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-        c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+        c.backLeftDirection.set(DcMotorSimple.Direction.FORWARD);
+        c.backRightDirection.set(DcMotorSimple.Direction.REVERSE);
         c.manualBrakeMode.set(false);
     });
 
@@ -52,18 +52,16 @@ public class Constants {
         c.backRightName.set("back_right");
         c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
         c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
-        c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-        c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+        c.backLeftDirection.set(DcMotorSimple.Direction.FORWARD);
+        c.backRightDirection.set(DcMotorSimple.Direction.REVERSE);
         c.manualBrakeMode.set(true);
     });
 
-
-
     public static OTOSConfig localizerConfig = new OTOSConfig(c -> {
         c.name.set("otos");
-        c.linearScalar.set(0.987169399555226);
-        c.angularScalar.set(0.9797871068054063);
-        c.offset.set(new Pose(-0.0, -0.0, 90));
+        c.linearScalar.set(.9);
+        c.angularScalar.set(0.9839058371366785);
+        c.offset.set(new Pose(0.7749542476624016, 1.8863227423720472));
         c.linearUnit.set(DistanceUnit.INCH);
     });
 

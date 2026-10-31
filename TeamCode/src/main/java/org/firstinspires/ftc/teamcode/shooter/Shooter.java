@@ -99,7 +99,6 @@ public class Shooter extends SubsystemIF {
 
     @Override
     public void periodic() {
-        shooterPID.setPIDF(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F); // TODO: delete once the PID is tuned
 
         double velocity = getShooterVelocity();
         double output = 0;

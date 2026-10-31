@@ -75,7 +75,7 @@ public class Chassis extends SubsystemIF {
 
     public void setDrivePowers(double fwd, double str, double rot) {
         DrivePowers powers = ManualDrive.fieldCentric(
-                fwd, str, rot, follower.pose().heading());
+                fwd, -str, -rot, follower.pose().heading());
         follower.manual(powers);
     }
 
