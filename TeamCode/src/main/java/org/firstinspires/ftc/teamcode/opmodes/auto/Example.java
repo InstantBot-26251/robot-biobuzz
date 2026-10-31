@@ -6,7 +6,7 @@ import com.pedropathing.paths.Path;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.Commands;
 
-import org.firstinspires.ftc.teamcode.util.Alliance;
+import org.firstinspires.ftc.teamcode.opmodes.Alliance;
 import org.firstinspires.ftc.teamcode.util.AutoFactory;
 
 public class Example extends AutoFactory {
@@ -32,5 +32,4 @@ public class Example extends AutoFactory {
                 robot.followPath(path1())
         );
     }
-
 }

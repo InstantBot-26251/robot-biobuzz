@@ -7,6 +7,8 @@ import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 
 import org.firstinspires.ftc.teamcode.RobotContainer;
+import org.firstinspires.ftc.teamcode.opmodes.Alliance;
+import org.firstinspires.ftc.teamcode.opmodes.AllianceStore;
 
 public abstract class AutoFactory extends OpMode {
     protected final PoseFactory poseFactory = PoseFactory.degrees();
@@ -19,7 +21,7 @@ public abstract class AutoFactory extends OpMode {
 
     @Override
     public void init() {
-        Alliance.setCurrent(getAlliance());
+        AllianceStore.save(getAlliance());
         startPose = setStartPose();
 
         robot = new RobotContainer(hardwareMap, telemetry, gamepad1, gamepad2);
@@ -30,18 +32,19 @@ public abstract class AutoFactory extends OpMode {
 
     @Override
     public void init_loop() {
-        telemetry.addData("Alliance", Alliance.getCurrent());
-        telemetry.update();
+        robot.getTelemetry().addData("Alliance", Alliance.getCurrent());
+        robot.getTelemetry().addData("Start pose", startPose);
+        robot.initLoop();
     }
 
     @Override
     public void start() {
+        robot.setPose(startPose);
         CommandScheduler.getInstance().schedule(createAutoSequence());
     }
 
     @Override
     public void loop() {
-
         robot.periodic();
     }
 

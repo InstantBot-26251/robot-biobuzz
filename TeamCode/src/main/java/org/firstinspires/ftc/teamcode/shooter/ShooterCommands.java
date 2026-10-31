@@ -4,6 +4,7 @@ import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.Commands;
 
 import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
+import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.MANUAL_TRIM_STEP_RPM;
 
 public class ShooterCommands {
     public static Command enableShooter(Shooter shooter) {
@@ -19,8 +20,21 @@ public class ShooterCommands {
     }
 
     public static Command shoot(Shooter shooter) {
-        return Commands.sequence(Commands.runOnce(shooter::enableShooter, shooter),
-                Commands.waitMillis(10),
-                Commands.runOnce(shooter::startUpServos, shooter));
+        return Commands.runOnce(() -> {
+            if (shooter.getMode() == Shooter.Mode.OFF) shooter.enableShooter();
+            shooter.startUpServos();
+        }, shooter);
+    }
+
+    public static Command trimUp(Shooter shooter) {
+        return Commands.runOnce(() -> shooter.adjustTrim(MANUAL_TRIM_STEP_RPM));
+    }
+
+    public static Command trimDown(Shooter shooter) {
+        return Commands.runOnce(() -> shooter.adjustTrim(-MANUAL_TRIM_STEP_RPM));
+    }
+
+    public static Command resetTrim(Shooter shooter) {
+        return Commands.runOnce(shooter::resetTrim);
     }
 }
