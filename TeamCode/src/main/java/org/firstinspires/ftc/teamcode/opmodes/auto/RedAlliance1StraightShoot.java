@@ -28,7 +28,6 @@ public class RedAlliance1StraightShoot extends AutoFactory {
         return Paths.line(startPose, point1).linear(startPose, point1);
     }
 
-
     @Override
     protected Command createAutoSequence() {
         return Commands.sequence(

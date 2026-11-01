@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.AutoFactory;
 
 @Autonomous(name = "Blue Alliance Straight Shoot-D,6")
 public class BlueAlliance1StraightShoot extends AutoFactory {
-    private final Pose point1 = poseFactory.of(85.6805, 109.4573, 270);
+    private final Pose point1 = poseFactory.of(85.6805, -119.4573, -90);
 
     @Override
     protected Alliance getAlliance() {
@@ -21,7 +21,7 @@ public class BlueAlliance1StraightShoot extends AutoFactory {
 
     @Override
     protected Pose setStartPose() {
-        return poseFactory.of(85.861, 132.7149, 270);
+        return poseFactory.of(85.861, -132.7149, -90);
     }
 
     private Path path1() {
