@@ -13,9 +13,9 @@ import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.Commands;
 import com.seattlesolvers.solverslib.command.Robot;
 import com.seattlesolvers.solverslib.command.Subsystem;
+import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.depollinator.Depollinator;
 import org.firstinspires.ftc.teamcode.depollinator.DepollinatorCommands;
@@ -30,7 +30,6 @@ import org.firstinspires.ftc.teamcode.shooter.ShooterCommands;
 import org.firstinspires.ftc.teamcode.util.PanelsDrawing;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 import org.firstinspires.ftc.teamcode.vision.Limelight;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,24 +120,26 @@ public class RobotContainer extends Robot {
 
         shooter.setFeedPermission(() -> !aimHeld() || aimLocked());
 
-        gamepad1.getGamepadButton(GamepadKeys.Button.START)
-                .whenPressed(chassis::resetHeading);
+        gamepad1.getGamepadButton(GamepadKeys.Button.TOUCHPAD)
+                        .whenPressed(chassis::resetHeading);
 
-        gamepad2.getGamepadButton(GamepadKeys.Button.A).whenPressed(ShooterCommands.enableShooter(shooter));
-        gamepad2.getGamepadButton(GamepadKeys.Button.Y).whenPressed(ShooterCommands.disableShooter(shooter));
-        gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.shoot(shooter))
-                .whenReleased(ShooterCommands.disableShooterServo(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.enableShooter(shooter))
+                .whenReleased(ShooterCommands.disableShooter(shooter));
+        new Trigger(() -> gamepad2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2)
+                .whenActive(ShooterCommands.shoot(shooter))
+                .whenInactive(ShooterCommands.disableShooterServo(shooter));
+
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(ShooterCommands.trimUp(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(ShooterCommands.trimDown(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(ShooterCommands.resetTrim(shooter));
 
-        gamepad2.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(IntakeCommands.intake(intake))
-                .whenReleased(IntakeCommands.stopIntake(intake));
-        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+        new Trigger(() -> gamepad2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5)
+                .whenActive(IntakeCommands.intake(intake))
+                .whenInactive(IntakeCommands.stopIntake(intake));
+        gamepad2.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(DepollinatorCommands.depollinate(depollinator))
                 .whenReleased(DepollinatorCommands.restDepollinator(depollinator));
-        gamepad2.getGamepadButton(GamepadKeys.Button.B)
+        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(IntakeCommands.outtake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
     }

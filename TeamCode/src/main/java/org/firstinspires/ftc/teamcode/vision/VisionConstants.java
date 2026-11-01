@@ -10,7 +10,7 @@ public class VisionConstants {
     public static double CAMERA_LEFT_IN = 0.0;
 
     public static String LIMELIGHT_NAME = "limelight";
-    public static int APRILTAG_PIPELINE = 2;
+    public static int APRILTAG_PIPELINE = 0;
     public static double CAMERA_YAW_DEG = 0.0;
 
     public static double UP_CELL_TAG_HEIGHT_IN = 49.9;
