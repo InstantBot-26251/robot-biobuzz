@@ -139,6 +139,11 @@ public class Limelight extends SubsystemIF {
         telemetry.addData("LL Note", tracker.getLastNote());
         telemetry.addData("LL Tag Heights (in)", tracker.getLastTagHeights()
                 + (USE_TAG_RANGE ? "" : " (ignored: USE_TAG_RANGE off)"));
+        double measuredHeight = HiveTracker.measuredUpHeightAboveCamera();
+        telemetry.addData("LL Up Tags Above Camera (in)", Double.isNaN(measuredHeight)
+                ? "measuring (needs 2+ tags of a cell in view)"
+                : String.format(java.util.Locale.US, "%.1f  -> real camera height ~%.1f in (CAMERA_HEIGHT_IN is %.1f)",
+                        measuredHeight, UP_CELL_TAG_HEIGHT_IN - measuredHeight, CAMERA_HEIGHT_IN));
         telemetry.addData("LL Distance (in)", getDistance(pose));
         telemetry.addData("LL Aim Error (deg)", getAimErrorDeg(pose));
         telemetry.addData("LL Latency (ms)", lastLatencyMs);
