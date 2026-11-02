@@ -132,10 +132,6 @@ public class RobotContainer extends Robot {
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(ShooterCommands.trimUp(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(ShooterCommands.trimDown(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(ShooterCommands.resetTrim(shooter));
-        gamepad2.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(IntakeCommands.intake(intake))
-                .whenReleased(IntakeCommands.stopIntake(intake));
-        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
 
         new Trigger(() -> gamepad2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5)
                 .whenActive(IntakeCommands.intake(intake))
