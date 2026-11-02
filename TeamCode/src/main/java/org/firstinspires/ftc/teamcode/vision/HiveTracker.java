@@ -260,16 +260,16 @@ public class HiveTracker {
                 cell = cellHeight[0] >= cellHeight[1] ? 0 : 1;
             } else {
                 cell = count[0] == count[1] ? currentUpCell : count[0] > count[1] ? 0 : 1;
-                if (!Double.isNaN(cellHeight[cell]) && cellHeight[cell] < learned - halfGap) {
-                    switchUpCell(1 - cell);
-                    lastNote = cellName(cell) + " is the DOWN cell (measured height)";
-                    return;
-                }
             }
+            // Always track the cell we can see; if it sits low, use its own measured height for the distance
+            double seenHeight = cellHeightAboveCamera(ours, cell, MIN_LEARN_SPACING_IN);
+            double tagHeight = seenHeight > 0 && seenHeight < learned - halfGap
+                    ? CAMERA_HEIGHT_IN + seenHeight
+                    : upTagHeight(SIMPLE_TAG_HEIGHT_IN);
             lastUsedRange = false;
             switchUpCell(cell);
             learnHeight(ours, cell, cellHeight[1 - cell]);
-            addFix(projectCell(ours, cell, upTagHeight(SIMPLE_TAG_HEIGHT_IN), Double.NEGATIVE_INFINITY, capturePose),
+            addFix(projectCell(ours, cell, tagHeight, Double.NEGATIVE_INFINITY, capturePose),
                     cell, nowMs, " (simple)");
             return;
         }

@@ -232,7 +232,7 @@ public class Shooter extends SubsystemIF {
                 }
                 usingDistance = !Double.isNaN(rpm);
                 if (!usingDistance) rpm = DEFAULT_RPM;
-                return Math.max(MIN_RPM, Math.min(MAX_RPM, rpm + trimRpm));
+                return Math.max(MIN_RPM, Math.min(MAX_RPM, rpm + SHOT_RPM_OFFSET + trimRpm));
             case OFF:
             default:
                 usingDistance = false;

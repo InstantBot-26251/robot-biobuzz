@@ -120,7 +120,7 @@ public class RobotContainer extends Robot {
 
         shooter.setFeedPermission(() -> !aimHeld() || aimLocked());
 
-        gamepad1.getGamepadButton(GamepadKeys.Button.TOUCHPAD)
+        gamepad1.getGamepadButton(GamepadKeys.Button.OPTIONS)
                         .whenPressed(chassis::resetHeading);
 
         gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(ShooterCommands.enableShooter(shooter))
@@ -132,14 +132,13 @@ public class RobotContainer extends Robot {
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(ShooterCommands.trimUp(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(ShooterCommands.trimDown(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(ShooterCommands.resetTrim(shooter));
-
-        new Trigger(() -> gamepad2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5)
+        gamepad2.getGamepadButton(GamepadKeys.Button.A)
                 .whenActive(IntakeCommands.intake(intake))
                 .whenInactive(IntakeCommands.stopIntake(intake));
-        gamepad2.getGamepadButton(GamepadKeys.Button.A)
+        gamepad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(DepollinatorCommands.depollinate(depollinator))
                 .whenReleased(DepollinatorCommands.restDepollinator(depollinator));
-        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+        gamepad2.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(IntakeCommands.outtake(intake))
                 .whenReleased(IntakeCommands.stopIntake(intake));
     }

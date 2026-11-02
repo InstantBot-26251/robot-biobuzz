@@ -38,6 +38,7 @@ public class Limelight extends SubsystemIF {
     private static final double PIPELINE_SEARCH_MS = 400;
     private static int foundPipeline = -1;
     private int activePipeline = APRILTAG_PIPELINE;
+    private boolean pipelineSearchDone = false;
     private final ElapsedTime pipelineTimer = new ElapsedTime();
 
     public Limelight(Telemetry telemetry, HardwareMap hardwareMap, Chassis chassis) {
@@ -67,20 +68,29 @@ public class Limelight extends SubsystemIF {
         if (limelight == null) return;
         limelight.setPollRateHz(100);
         activePipeline = foundPipeline >= 0 ? foundPipeline : APRILTAG_PIPELINE;
+        pipelineSearchDone = false;
         limelight.pipelineSwitch(activePipeline);
         pipelineTimer.reset();
         limelight.start();
     }
 
-    // Until some pipeline actually reports AprilTags, step through them all; then stay on that one
+    // Only leave a pipeline that isn't an AprilTag one, and give up after one full lap.
+    // Seeing no tags right now is normal, so that alone never moves us off a pipeline.
     private void checkPipeline(LLResult result) {
-        if (foundPipeline >= 0 || result.getPipelineIndex() != activePipeline) return;
-        if (!result.getFiducialResults().isEmpty()) {
+        if (foundPipeline >= 0 || pipelineSearchDone) return;
+        if (result.getPipelineIndex() != activePipeline) {
+            pipelineTimer.reset();
+            return;
+        }
+        String type = result.getPipelineType();
+        boolean aprilTagType = type != null && type.toLowerCase().contains("fiducial");
+        if (!result.getFiducialResults().isEmpty() || aprilTagType) {
             foundPipeline = activePipeline;
             return;
         }
-        if (pipelineTimer.milliseconds() < PIPELINE_SEARCH_MS) return;
+        if (type == null || type.isEmpty() || pipelineTimer.milliseconds() < PIPELINE_SEARCH_MS) return;
         activePipeline = (activePipeline + 1) % PIPELINE_COUNT;
+        if (activePipeline == APRILTAG_PIPELINE) pipelineSearchDone = true;
         limelight.pipelineSwitch(activePipeline);
         pipelineTimer.reset();
     }
@@ -136,7 +146,7 @@ public class Limelight extends SubsystemIF {
                 }
                 checkPipeline(result);
                 raw = "pipeline " + result.getPipelineIndex() + " (" + result.getPipelineType() + ")"
-                        + (foundPipeline >= 0 ? " LOCKED" : " searching pipelines for tags")
+                        + (foundPipeline >= 0 ? " LOCKED" : pipelineSearchDone ? " NO APRILTAG PIPELINE FOUND" : " checking pipeline")
                         + " | valid " + result.isValid()
                         + " | age " + result.getStaleness() + " ms | tag IDs " + (ids.length() == 0 ? "none" : ids)
                         + " | connected " + limelight.isConnected() + ", running " + limelight.isRunning();

@@ -7,7 +7,9 @@ public class ShooterConstants {
     public static double[] SHOT_DISTANCES_IN = {};
     public static double[] SHOT_RPMS = {};
 
-    public static double DEFAULT_RPM = 4500;
+    public static double DEFAULT_RPM = 3000;
+
+    public static double SHOT_RPM_OFFSET = 350;
 
     public static double MAX_EXTRAPOLATE_IN = 8;
 
@@ -39,7 +41,7 @@ public class ShooterConstants {
     public static long ENCODER_DEAD_MS = 1000;
 
     public static double SERVO_POWER = 0.75;
-    public static double MANUAL_TRIM_STEP_RPM = 50;
+    public static double MANUAL_TRIM_STEP_RPM = 100;
 
     public enum VelocitySource { RIGHT, LEFT, AVERAGE }
 
