@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+import java.util.List;
+
 public final class TargetMath {
     private TargetMath() {}
 
@@ -24,6 +26,33 @@ public final class TargetMath {
         double x = camForwardIn + cx * Math.cos(yaw) - cy * Math.sin(yaw);
         double y = camLeftIn + cx * Math.sin(yaw) + cy * Math.cos(yaw);
         return new double[]{x, y};
+    }
+
+    public static double[] perInchOfHeight(double txDeg, double tyDeg, double camPitchDeg, double camYawDeg) {
+        double right = Math.tan(Math.toRadians(txDeg));
+        double up = Math.tan(Math.toRadians(tyDeg));
+        double pitch = Math.toRadians(camPitchDeg);
+        double forward = Math.cos(pitch) - up * Math.sin(pitch);
+        double vertical = Math.sin(pitch) + up * Math.cos(pitch);
+        if (vertical < 1e-3) return null;
+        double cx = forward / vertical;
+        double cy = -right / vertical;
+        double yaw = Math.toRadians(camYawDeg);
+        return new double[]{cx * Math.cos(yaw) - cy * Math.sin(yaw), cx * Math.sin(yaw) + cy * Math.cos(yaw)};
+    }
+
+    public static double heightFromSpacing(List<double[]> perInch, List<Double> lateralOffsets) {
+        double num = 0, den = 0;
+        for (int i = 0; i < perInch.size(); i++) {
+            for (int j = i + 1; j < perInch.size(); j++) {
+                double spacing = Math.abs(lateralOffsets.get(i) - lateralOffsets.get(j));
+                if (spacing < 1e-6) continue;
+                double apart = Math.hypot(perInch.get(i)[0] - perInch.get(j)[0], perInch.get(i)[1] - perInch.get(j)[1]);
+                num += spacing * apart;
+                den += apart * apart;
+            }
+        }
+        return den < 1e-12 ? Double.NaN : num / den;
     }
 
     public static double heightFromRange(double txDeg, double tyDeg, double rangeIn,
