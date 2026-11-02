@@ -69,6 +69,9 @@ public class Shooter extends SubsystemIF {
     private final ElapsedTime voltageTimer = new ElapsedTime();
     private final ElapsedTime feedRequestTimer = new ElapsedTime();
     private int loadedShotPoints = 0;
+    private double rawLeftRpm = 0, rawRightRpm = 0;
+    private boolean encoderDead = false;
+    private final ElapsedTime noSpeedTimer = new ElapsedTime();
 
     public Shooter(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
@@ -196,8 +199,11 @@ public class Shooter extends SubsystemIF {
     }
 
     private double readRpm() {
-        double right = toRpm(rightShooterMotor.getVelocity());
-        double left = toRpm(leftShooterMotor.getVelocity());
+        // Shooter only spins one way, so a backwards-counting encoder still gives the real speed
+        double right = Math.abs(toRpm(rightShooterMotor.getVelocity()));
+        double left = Math.abs(toRpm(leftShooterMotor.getVelocity()));
+        rawRightRpm = right;
+        rawLeftRpm = left;
         switch (VELOCITY_SOURCE) {
             case LEFT:
                 return left;
@@ -270,14 +276,23 @@ public class Shooter extends SubsystemIF {
                 integral = 0;
             }
 
-            power = (SHOOTER_KV * targetRpm + SHOOTER_KS) * compensation
-                    + SHOOTER_P * error
-                    + SHOOTER_I * integral;
+            // Encoder reads ~0 while the motor has been pushed hard: speed reading can't be trusted
+            if (raw > ENCODER_DEAD_RPM || lastPower < 0.5) noSpeedTimer.reset();
+            if (noSpeedTimer.milliseconds() > ENCODER_DEAD_MS) encoderDead = true;
+            if (raw > ENCODER_DEAD_RPM) encoderDead = false;
 
-            if (error > SPINUP_BOOST_RPM) {
-                power = 1.0;
-            } else if (error < -2 * SHOOTER_VELOCITY_TOLERANCE) {
-                power = -Math.abs(MAX_SLOWDOWN_POWER);
+            double feedforward = (SHOOTER_KV * targetRpm + SHOOTER_KS) * compensation;
+            if (encoderDead) {
+                // No speed feedback: just apply the power that normally gives this RPM
+                integral = 0;
+                power = feedforward;
+            } else {
+                power = feedforward + SHOOTER_P * error + SHOOTER_I * integral;
+                if (error > SPINUP_BOOST_RPM) {
+                    power = 1.0;
+                } else if (error < -2 * SHOOTER_VELOCITY_TOLERANCE) {
+                    power = -Math.abs(MAX_SLOWDOWN_POWER);
+                }
             }
             power = Math.max(-Math.abs(MAX_SLOWDOWN_POWER), Math.min(1, power));
         }
@@ -317,6 +332,8 @@ public class Shooter extends SubsystemIF {
         telemetry.addData("Shooter Target RPM", targetRpm);
         telemetry.addData("Shooter RPM", measuredRpm);
         telemetry.addData("Shooter Power", power);
+        telemetry.addData("Shooter Encoders L / R (RPM)", String.format(java.util.Locale.US, "%.0f / %.0f", rawLeftRpm, rawRightRpm));
+        if (encoderDead) telemetry.addLine("Shooter: ENCODER READS 0 - running on feedforward only, check encoder cables");
         telemetry.addData("Shooter Trim RPM", trimRpm);
         telemetry.addData("Shooter Ready", atTargetVelocity());
         telemetry.addData("Shooter Feeding", feeding);

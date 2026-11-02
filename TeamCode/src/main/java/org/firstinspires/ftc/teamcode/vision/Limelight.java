@@ -34,6 +34,12 @@ public class Limelight extends SubsystemIF {
     private double lastLatencyMs = Double.NaN;
     private boolean fieldLocalized = false;
 
+    private static final int PIPELINE_COUNT = 10;
+    private static final double PIPELINE_SEARCH_MS = 400;
+    private static int foundPipeline = -1;
+    private int activePipeline = APRILTAG_PIPELINE;
+    private final ElapsedTime pipelineTimer = new ElapsedTime();
+
     public Limelight(Telemetry telemetry, HardwareMap hardwareMap, Chassis chassis) {
         this.telemetry = telemetry;
         this.chassis = chassis;
@@ -60,8 +66,23 @@ public class Limelight extends SubsystemIF {
         tracker.reset(Alliance.getCurrent(), fieldLocalized);
         if (limelight == null) return;
         limelight.setPollRateHz(100);
-        limelight.pipelineSwitch(APRILTAG_PIPELINE);
+        activePipeline = foundPipeline >= 0 ? foundPipeline : APRILTAG_PIPELINE;
+        limelight.pipelineSwitch(activePipeline);
+        pipelineTimer.reset();
         limelight.start();
+    }
+
+    // Until some pipeline actually reports AprilTags, step through them all; then stay on that one
+    private void checkPipeline(LLResult result) {
+        if (foundPipeline >= 0 || result.getPipelineIndex() != activePipeline) return;
+        if (!result.getFiducialResults().isEmpty()) {
+            foundPipeline = activePipeline;
+            return;
+        }
+        if (pipelineTimer.milliseconds() < PIPELINE_SEARCH_MS) return;
+        activePipeline = (activePipeline + 1) % PIPELINE_COUNT;
+        limelight.pipelineSwitch(activePipeline);
+        pipelineTimer.reset();
     }
 
     public void stop() {
@@ -113,10 +134,14 @@ public class Limelight extends SubsystemIF {
                 for (LLResultTypes.FiducialResult f : result.getFiducialResults()) {
                     ids.append(ids.length() == 0 ? "" : ",").append(f.getFiducialId());
                 }
-                raw = "pipeline " + result.getPipelineIndex() + " | valid " + result.isValid()
-                        + " | age " + result.getStaleness() + " ms | tag IDs " + (ids.length() == 0 ? "none" : ids);
+                checkPipeline(result);
+                raw = "pipeline " + result.getPipelineIndex() + " (" + result.getPipelineType() + ")"
+                        + (foundPipeline >= 0 ? " LOCKED" : " searching pipelines for tags")
+                        + " | valid " + result.isValid()
+                        + " | age " + result.getStaleness() + " ms | tag IDs " + (ids.length() == 0 ? "none" : ids)
+                        + " | connected " + limelight.isConnected() + ", running " + limelight.isRunning();
             }
-            if (result != null && result.isValid()
+            if (result != null && !result.getFiducialResults().isEmpty()
                     && result.getStaleness() <= MAX_FRAME_AGE_MS
                     && result.getControlHubTimeStamp() != lastFrameStamp) {
                 lastFrameStamp = result.getControlHubTimeStamp();
