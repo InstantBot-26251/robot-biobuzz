@@ -9,7 +9,7 @@ public class ShooterConstants {
 
     public static double DEFAULT_RPM = 3000;
 
-    public static double SHOT_RPM_OFFSET = 350;
+    public static double SHOT_RPM_OFFSET = 200;
 
     public static double MAX_EXTRAPOLATE_IN = 8;
 
