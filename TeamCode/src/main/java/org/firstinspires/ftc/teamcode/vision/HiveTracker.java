@@ -176,7 +176,13 @@ public class HiveTracker {
         lastTagHeights = heights.length() == 0 ? "-" : heights.toString();
         lastAllianceTags = ours.size();
         lastUpTags = 0;
-        if (ours.isEmpty()) return;
+        if (ours.isEmpty()) {
+            if (!tags.isEmpty()) {
+                lastNote = "sees tag " + tags.get(0).id + " but alliance is " + alliance
+                        + " (needs " + alliance.firstTagId + "-" + alliance.lastTagId + ")";
+            }
+            return;
+        }
 
         if (SIMPLE_TRACKING) {
             int[] count = new int[2];

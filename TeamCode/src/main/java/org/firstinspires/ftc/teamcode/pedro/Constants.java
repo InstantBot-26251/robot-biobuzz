@@ -33,7 +33,7 @@ public class Constants {
         );
     }
 
-    public static final boolean MOTORS_MIRRORED_LEFT_RIGHT = true;
+    public static final boolean MOTORS_MIRRORED_LEFT_RIGHT = false;
 
     private static void configureMotors(MecanumConfig c) {
         if (MOTORS_MIRRORED_LEFT_RIGHT) {
@@ -43,17 +43,18 @@ public class Constants {
             c.backRightName.set("back_left");
             c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
             c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
-            c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-            c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+            c.backLeftDirection.set(DcMotorSimple.Direction.FORWARD);
+            c.backRightDirection.set(DcMotorSimple.Direction.REVERSE);
         } else {
             c.frontLeftName.set("front_left");
             c.frontRightName.set("front_right");
             c.backLeftName.set("back_left");
             c.backRightName.set("back_right");
+            // Same physical motor directions as the mirrored setup, so forward is unchanged
             c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
             c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
-            c.backLeftDirection.set(DcMotorSimple.Direction.FORWARD);
-            c.backRightDirection.set(DcMotorSimple.Direction.REVERSE);
+            c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+            c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
         }
     }
 

@@ -35,6 +35,9 @@ public class ShooterConstants {
 
     public static double MAX_SLOWDOWN_POWER = 0.3;
 
+    public static double ENCODER_DEAD_RPM = 200;
+    public static long ENCODER_DEAD_MS = 1000;
+
     public static double SERVO_POWER = 0.75;
     public static double MANUAL_TRIM_STEP_RPM = 50;
 

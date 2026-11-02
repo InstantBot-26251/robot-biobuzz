@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.tests;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,12 +10,16 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp
+@Configurable
 public class MotorTesting extends OpMode {
     private DcMotorEx motor;
 
+    public static String test = "left_motor";
+
+
     @Override
     public void init() {
-        motor = hardwareMap.get(DcMotorEx.class, "1");
+        motor = hardwareMap.get(DcMotorEx.class, test);
 
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
