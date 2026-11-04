@@ -425,12 +425,12 @@ class HeadingBraking extends TuningOpMode<List<Double>> {
     Function<HardwareMap, Drivetrain> drivetrainFunction;
 
     private static double[] POWERS;
-    public static double MAX_BRAKE_TIME = 3; //seconds, the robot shouldn't take longer than this to brake
+    public static double MAX_BRAKE_TIME = 3;
 
     public static int trials = 12;
     public static double maxPower = 1;
     public static double minPower = 0.2;
-    public static double bias = 1.5; // how much it favors doing trials with higher powers
+    public static double bias = 1.5;
     public static double brakingPower = 0.001;
 
     private final ElapsedTime timer = new ElapsedTime();
@@ -445,7 +445,6 @@ class HeadingBraking extends TuningOpMode<List<Double>> {
     private double measuredVelocity;
     private double totalHeading;
     private double previousHeading;
-//    private VoltageSensor voltageSensor;
 
     public HeadingBraking(Function<HardwareMap, Localizer> localizerFunction, Function<HardwareMap, Drivetrain> drivetrainFunction) {
         super("Heading Braking", "A tuner for finding the Heading Braking Coefficients. The robot will turn back at forth at various speed levels.", false);
@@ -482,12 +481,6 @@ class HeadingBraking extends TuningOpMode<List<Double>> {
             if (iteration < POWERS.length) {
                 power = POWERS[iteration];
             }
-
-//            if (state != State.DONE) {
-//                double voltage = voltageSensor.getVoltage();
-//                double duty = state == State.BRAKE ? -brakingPower * direction: power * direction;
-//                double appliedVoltage = voltage * duty;
-//            }
 
             switch (state) {
                 case DRIVE: {
@@ -532,7 +525,6 @@ class HeadingBraking extends TuningOpMode<List<Double>> {
                 case DONE: {}
             }
         }
-
 
         return coefficients;
     }
@@ -790,7 +782,6 @@ class ForwardBraking extends TuningOpMode<List<Double>> {
         double error = headingError - brakeDist;
         return Utils.clamp(headingKP * error, -0.3, 1.0) / 2;
     }
-
 
     private void drive(Drivetrain drivetrain, Localizer localizer) {
         drivetrain.drive(new DrivePowers(power * direction, 0.0, getHeadingPower(localizer)), false);
@@ -1093,7 +1084,6 @@ class ForwardTranslational extends TuningOpMode<List<Double>> {
         double kP_large = calculatekP(ALPHA_LARGE);
         double kP_small = calculatekP(ALPHA_SMALL);
 
-        //  kP_large, kP_small, coast kV, and brake kV (scaled by aggressiveness factor)
         return List.of(kP_large, kP_small, kV, kV * VEL_AGGRESSIVENESS);
     }
 
@@ -1250,4 +1240,3 @@ class StrafeTranslational extends TuningOpMode<List<Double>> {
         this.tau = -1.0/linReg[1];
     }
 }
-

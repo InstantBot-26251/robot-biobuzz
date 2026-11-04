@@ -13,9 +13,6 @@ public class DriveConstants {
     public static double AIM_MAX_TURN = 0.8;
     public static double AIM_TOLERANCE_DEG = 2.0;
 
-    public static long AIM_TIMEOUT_MS = 1500;
-    public static long AIM_SETTLE_MS = 120;
-
     public static double AIM_FEED_TOLERANCE_DEG = 3.0;
 
     public static double SLOW_MODE_DRIVE_SCALE = 0.35;

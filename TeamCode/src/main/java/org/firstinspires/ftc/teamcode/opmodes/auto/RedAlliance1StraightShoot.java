@@ -31,7 +31,7 @@ public class RedAlliance1StraightShoot extends AutoFactory {
 
     private final Pose start = poseFactory.of(56.9587, 9.447, 90);
     private final Pose forward = poseFactory.of(56.9587, 15.447, 90);
-    // Face the red hive when shooting so the Limelight (front of robot) can see the tags
+
     private final Pose point1 = new Pose(56.9587, 22.7419, Math.atan2(
             VisionConstants.RED_HIVE_Y_IN - 22.7419, VisionConstants.HIVE_CENTER_X_IN - 56.9587));
     private final Pose point2 = poseFactory.of(70.6855, 47.484, 60.9389);
@@ -73,7 +73,6 @@ public class RedAlliance1StraightShoot extends AutoFactory {
         return new Pose(from.x() + (to.x() - from.x()) * d / length,
                 from.y() + (to.y() - from.y()) * d / length, 0);
     }
-
 
     @Override
     protected Command createAutoSequence() {

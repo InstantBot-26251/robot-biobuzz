@@ -74,8 +74,6 @@ public class Limelight extends SubsystemIF {
         limelight.start();
     }
 
-    // Only leave a pipeline that isn't an AprilTag one, and give up after one full lap.
-    // Seeing no tags right now is normal, so that alone never moves us off a pipeline.
     private void checkPipeline(LLResult result) {
         if (foundPipeline >= 0 || pipelineSearchDone) return;
         if (result.getPipelineIndex() != activePipeline) {
@@ -113,6 +111,10 @@ public class Limelight extends SubsystemIF {
 
     public boolean isLive() {
         return tracker.isLive(clock.milliseconds());
+    }
+
+    public int getLiveTagCount() {
+        return isLive() ? tracker.getLastUpTags() : 0;
     }
 
     public double getDistance(Pose robot) {

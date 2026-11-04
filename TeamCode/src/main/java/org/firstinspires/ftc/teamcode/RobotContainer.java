@@ -27,9 +27,11 @@ import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
 import org.firstinspires.ftc.teamcode.chassis.DriveConstants;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.shooter.ShooterCommands;
+import org.firstinspires.ftc.teamcode.shooter.ShooterConstants;
 import org.firstinspires.ftc.teamcode.util.PanelsDrawing;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 import org.firstinspires.ftc.teamcode.vision.Limelight;
+import org.firstinspires.ftc.teamcode.vision.VisionConstants;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,6 +103,8 @@ public class RobotContainer extends Robot {
         for(SubsystemIF s : subsystems) {
             s.autonomousInit();
         }
+
+        shooter.setFeedPermission(() -> !AutoConstants.AUTO_AIM || aimLocked());
     }
 
     public void teleopInit() {
@@ -127,7 +131,11 @@ public class RobotContainer extends Robot {
                 .whenReleased(ShooterCommands.disableShooter(shooter));
         new Trigger(() -> gamepad2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2)
                 .whenActive(ShooterCommands.shoot(shooter))
-                .whenInactive(ShooterCommands.disableShooterServo(shooter));
+                .whenInactive(ShooterCommands.releaseShoot(shooter,
+                        () -> gamepad2.getButton(GamepadKeys.Button.RIGHT_BUMPER)));
+        new Trigger(() -> gamepad2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2)
+                .whenActive(ShooterCommands.holdFixedRpm(shooter))
+                .whenInactive(ShooterCommands.releaseFixedRpm(shooter));
 
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(ShooterCommands.trimUp(shooter));
         gamepad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(ShooterCommands.trimDown(shooter));
@@ -164,13 +172,18 @@ public class RobotContainer extends Robot {
         return !Double.isNaN(error) && Math.abs(error) <= DriveConstants.AIM_FEED_TOLERANCE_DEG;
     }
 
+    private boolean readyToShoot() {
+        return shooter.atTargetVelocity()
+                && (shooter.isFixedRpmHeld() || limelight.getLiveTagCount() >= VisionConstants.READY_MIN_TAGS)
+                && (!aimHeld() || aimLocked());
+    }
+
     private void rumbleFeedback() {
-        boolean ready = shooter.atTargetVelocity();
+        boolean ready = DriveConstants.RUMBLE_FEEDBACK && readyToShoot();
         boolean locked = aimHeld() && aimLocked();
-        if (DriveConstants.RUMBLE_FEEDBACK) {
-            if (ready && !wasShooterReady) rawGamepad2.rumble(200);
-            if (locked && !wasAimLocked) rawGamepad1.rumble(150);
-        }
+        if (ready && !wasShooterReady) rawGamepad2.rumble(Gamepad.RUMBLE_DURATION_CONTINUOUS);
+        if (!ready && wasShooterReady) rawGamepad2.stopRumble();
+        if (DriveConstants.RUMBLE_FEEDBACK && locked && !wasAimLocked) rawGamepad1.rumble(150);
         wasShooterReady = ready;
         wasAimLocked = locked;
     }
@@ -178,6 +191,7 @@ public class RobotContainer extends Robot {
     public void stop() {
         ROBOT_POSE = chassis.getPose();
         POSE_FROM_AUTO = !teleop;
+        if (wasShooterReady) rawGamepad2.stopRumble();
         limelight.stop();
     }
 
@@ -198,22 +212,24 @@ public class RobotContainer extends Robot {
     }
 
     public Command aim() {
-        return ChassisCommands.createAimCommand(chassis, limelight);
+        return ChassisCommands.createTeleopDriveCommand(chassis, limelight, () -> 0, () -> 0, () -> 0, () -> true);
     }
 
     public Command aimAndShoot(long shootTime) {
+        boolean useAim = AutoConstants.AUTO_AIM;
+        Command shooting = Commands.sequence(
+                Commands.race(
+                        Commands.waitUntil(() -> shooter.atTargetVelocity() && (!useAim || aimLocked())),
+                        Commands.waitMillis(ShooterConstants.SPIN_UP_TIME_MS)),
+                ShooterCommands.shoot(shooter),
+                Commands.waitMillis(shootTime),
+                ShooterCommands.disableShooter(shooter));
         return Commands.sequence(
                 ShooterCommands.enableShooter(shooter),
                 Commands.race(
                         Commands.waitUntil(limelight::hasTarget),
                         Commands.waitMillis(AutoConstants.TARGET_WAIT_TIME)),
-                aim(),
-                Commands.race(
-                        Commands.waitUntil(shooter::atTargetVelocity),
-                        Commands.waitMillis(AutoConstants.MAX_SPIN_UP_TIME)),
-                ShooterCommands.shoot(shooter),
-                Commands.waitMillis(shootTime),
-                ShooterCommands.disableShooter(shooter));
+                useAim ? Commands.race(aim(), shooting) : shooting);
     }
 
     public Command shootFor(long shootTime) {
@@ -259,6 +275,7 @@ public class RobotContainer extends Robot {
         if (teleop) {
             telemetry.addData("Aim Locked", aimLocked());
             telemetry.addData("Slow Mode", slowHeld());
+            telemetry.addData("Ready To Shoot", readyToShoot());
         }
         telemetry.addData("Loop Time", timer.milliseconds());
         telemetry.update();

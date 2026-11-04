@@ -48,6 +48,9 @@ public class HiveTracker {
     private static int heightHead = 0;
     private static int heightCount = 0;
     private double lastFrameHeight = Double.NaN;
+    private static final int LOW_CELL_FRAMES = 8;
+    private static final int LOW_CELL_VOTE_MAX = 16;
+    private int lowCellVotes = 0;
 
     private boolean mapConfirmed = false;
     private boolean mapRejected = false;
@@ -65,6 +68,7 @@ public class HiveTracker {
         this.fieldLocalized = fieldLocalized;
         sampleCount = 0;
         lastSeenMs = -1e12;
+        lowCellVotes = 0;
         currentUpCell = Math.max(0, Math.min(1, ASSUMED_UP_CELL_AT_START));
         mapConfirmed = false;
         mapRejected = false;
@@ -153,11 +157,6 @@ public class HiveTracker {
 
     public double getLastFrameHeight() {
         return lastFrameHeight;
-    }
-
-    private static double upTagHeight(double configured) {
-        double measured = measuredUpHeightAboveCamera();
-        return Double.isNaN(measured) ? configured : CAMERA_HEIGHT_IN + measured;
     }
 
     private static void rememberUpHeight(double heightAboveCamera) {
@@ -255,17 +254,24 @@ public class HiveTracker {
             int cell;
             double learned = measuredUpHeightAboveCamera();
             if (Double.isNaN(learned)) learned = SIMPLE_TAG_HEIGHT_IN - CAMERA_HEIGHT_IN;
-            double halfGap = 0.5 * (UP_CELL_TAG_HEIGHT_IN - DOWN_CELL_TAG_HEIGHT_IN);
+            double lowBelow = learned - 0.7 * (UP_CELL_TAG_HEIGHT_IN - DOWN_CELL_TAG_HEIGHT_IN);
             if (!Double.isNaN(cellHeight[0]) && !Double.isNaN(cellHeight[1])) {
                 cell = cellHeight[0] >= cellHeight[1] ? 0 : 1;
+            } else if (count[0] > 0 && count[1] > 0) {
+                double[] elevation = new double[2];
+                for (Sighting s : ours) elevation[s.cell] += s.elevation / count[s.cell];
+                cell = elevation[0] >= elevation[1] ? 0 : 1;
             } else {
-                cell = count[0] == count[1] ? currentUpCell : count[0] > count[1] ? 0 : 1;
+                cell = count[0] > 0 ? 0 : 1;
             }
-            // Always track the cell we can see; if it sits low, use its own measured height for the distance
+
             double seenHeight = cellHeightAboveCamera(ours, cell, MIN_LEARN_SPACING_IN);
-            double tagHeight = seenHeight > 0 && seenHeight < learned - halfGap
-                    ? CAMERA_HEIGHT_IN + seenHeight
-                    : upTagHeight(SIMPLE_TAG_HEIGHT_IN);
+            if (count[0] > 0 && count[1] > 0) {
+                lowCellVotes = 0;
+            } else if (seenHeight > 0) {
+                lowCellVotes = Math.max(0, Math.min(LOW_CELL_VOTE_MAX, lowCellVotes + (seenHeight < lowBelow ? 1 : -1)));
+            }
+            double tagHeight = lowCellVotes >= LOW_CELL_FRAMES ? DOWN_CELL_TAG_HEIGHT_IN : SIMPLE_TAG_HEIGHT_IN;
             lastUsedRange = false;
             switchUpCell(cell);
             learnHeight(ours, cell, cellHeight[1 - cell]);
@@ -322,7 +328,7 @@ public class HiveTracker {
         }
         switchUpCell(upCell);
         learnHeight(ours, upCell, cellHeightAboveCamera(ours, 1 - upCell));
-        addFix(projectCell(ours, upCell, upTagHeight(UP_CELL_TAG_HEIGHT_IN), split, capturePose), upCell, nowMs, " UP");
+        addFix(projectCell(ours, upCell, UP_CELL_TAG_HEIGHT_IN, split, capturePose), upCell, nowMs, " UP");
     }
 
     private List<double[]> projectCell(List<Sighting> ours, int cell, double tagHeight, double minHeight, Pose capturePose) {
@@ -441,6 +447,7 @@ public class HiveTracker {
         if (cell != currentUpCell) {
             sampleCount = 0;
             lastSeenMs = -1e12;
+            lowCellVotes = 0;
             currentUpCell = cell;
         }
     }

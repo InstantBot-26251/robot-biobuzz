@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.shooter;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.Commands;
 
+import java.util.function.BooleanSupplier;
+
 import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.*;
 import static org.firstinspires.ftc.teamcode.shooter.ShooterConstants.MANUAL_TRIM_STEP_RPM;
 
@@ -26,12 +28,42 @@ public class ShooterCommands {
         }, shooter);
     }
 
+    public static Command holdFixedRpm(Shooter shooter) {
+        return Commands.runOnce(shooter::holdFixedRpm, shooter);
+    }
+
+    public static Command releaseFixedRpm(Shooter shooter) {
+        return Commands.runOnce(shooter::releaseFixedRpm, shooter);
+    }
+
+    public static Command releaseShoot(Shooter shooter, BooleanSupplier keepSpinning) {
+        return Commands.runOnce(() -> {
+            if (keepSpinning.getAsBoolean()) {
+                shooter.stopServos();
+            } else {
+                shooter.stopShooter();
+            }
+        }, shooter);
+    }
+
     public static Command trimUp(Shooter shooter) {
-        return Commands.runOnce(() -> shooter.adjustTrim(MANUAL_TRIM_STEP_RPM));
+        return Commands.runOnce(() -> {
+            if (shooter.isFixedRpmHeld()) {
+                shooter.adjustFixedRpm(FIXED_RPM_STEP);
+            } else {
+                shooter.adjustTrim(MANUAL_TRIM_STEP_RPM);
+            }
+        });
     }
 
     public static Command trimDown(Shooter shooter) {
-        return Commands.runOnce(() -> shooter.adjustTrim(-MANUAL_TRIM_STEP_RPM));
+        return Commands.runOnce(() -> {
+            if (shooter.isFixedRpmHeld()) {
+                shooter.adjustFixedRpm(-FIXED_RPM_STEP);
+            } else {
+                shooter.adjustTrim(-MANUAL_TRIM_STEP_RPM);
+            }
+        });
     }
 
     public static Command resetTrim(Shooter shooter) {
