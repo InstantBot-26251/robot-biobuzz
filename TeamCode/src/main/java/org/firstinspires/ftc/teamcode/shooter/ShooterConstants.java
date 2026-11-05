@@ -46,10 +46,16 @@ public class ShooterConstants {
 
     public static double MAX_SLOWDOWN_POWER = 0.3;
 
+    public static double SIDE_BALANCE_P = 0.0006;
+    public static double SIDE_BALANCE_MAX_POWER = 0.1;
+    public static double AUTO_RIGHT_RPM_TRIM = 0;
+
     public static double ENCODER_DEAD_RPM = 200;
     public static long ENCODER_DEAD_MS = 1000;
 
     public static double SERVO_POWER = 0.75;
+    public static double VOLLEY_SERVO_POWER = 0.5;
+    public static double VOLLEY_MAX_EXTRA_POWER = 0.1;
     public static double MANUAL_TRIM_STEP_RPM = 100;
 
     public enum VelocitySource { RIGHT, LEFT, AVERAGE }

@@ -30,21 +30,15 @@ public class RedAlliance1StraightShoot extends AutoFactory {
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
     private final Pose start = poseFactory.of(56.9587, 9.447, 90);
-    private final Pose forward = poseFactory.of(56.9587, 15.447, 90);
-
-    private final Pose point1 = new Pose(56.9587, 22.7419, Math.atan2(
-            VisionConstants.RED_HIVE_Y_IN - 22.7419, VisionConstants.HIVE_CENTER_X_IN - 56.9587));
+    private final Pose point1 = new Pose(56.9587, 18.447, Math.atan2(
+            VisionConstants.RED_HIVE_Y_IN - 18.447, VisionConstants.HIVE_CENTER_X_IN - 56.9587));
     private final Pose point2 = poseFactory.of(70.6855, 47.484, 60.9389);
     private final Pose point3 = poseFactory.of(70.1692, 94.8227, 90.6249);
     private final Pose point4 = poseFactory.of(46.5804, 118.831, 134.495);
     private final Pose point5 = poseFactory.of(18.6337, 113.1839, -170.274);
 
     public Path driveForward() {
-        return Paths.line(start, forward).constant(start);
-    }
-
-    public Path path1() {
-        return Paths.line(forward, point1).linear(forward, point1);
+        return Paths.line(start, point1).constant(start);
     }
 
     public Path park() {
@@ -79,7 +73,6 @@ public class RedAlliance1StraightShoot extends AutoFactory {
         return Commands.sequence(
                 robot.enableShooter(),
                 robot.followPath(driveForward()),
-                robot.followPath(path1()),
                 robot.aimAndShoot(AutoConstants.SHOOT_TIME),
                 robot.followPath(park())
         );

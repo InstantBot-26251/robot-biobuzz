@@ -54,6 +54,10 @@ public class Shooter extends SubsystemIF {
     private double fixedRpmAdjust = 0;
     private DoubleSupplier distanceSupplier = () -> Double.NaN;
     private BooleanSupplier feedPermission = () -> true;
+    private boolean forcedFeedAllowed = true;
+    private DoubleSupplier fixedAutoRpm = () -> 0;
+    private DoubleSupplier extraRpm = () -> 0;
+    private boolean feedLatched = false;
 
     private double targetRpm = 0;
     private double measuredRpm = 0;
@@ -74,6 +78,7 @@ public class Shooter extends SubsystemIF {
     private final ElapsedTime feedRequestTimer = new ElapsedTime();
     private int loadedShotPoints = 0;
     private double rawLeftRpm = 0, rawRightRpm = 0;
+    private double sideRpmDiff = 0;
     private boolean encoderDead = false;
     private final ElapsedTime noSpeedTimer = new ElapsedTime();
 
@@ -131,6 +136,18 @@ public class Shooter extends SubsystemIF {
 
     public void setFeedPermission(BooleanSupplier feedPermission) {
         this.feedPermission = feedPermission;
+    }
+
+    public void setForcedFeedAllowed(boolean forcedFeedAllowed) {
+        this.forcedFeedAllowed = forcedFeedAllowed;
+    }
+
+    public void setExtraRpm(DoubleSupplier extraRpm) {
+        this.extraRpm = extraRpm;
+    }
+
+    public void setFixedAutoRpm(DoubleSupplier fixedAutoRpm) {
+        this.fixedAutoRpm = fixedAutoRpm;
     }
 
     public void setDistanceSupplier(DoubleSupplier distanceSupplier) {
@@ -270,6 +287,10 @@ public class Shooter extends SubsystemIF {
                 usingDistance = false;
                 return manualRpm;
             case AUTO:
+                if (fixedAutoRpm.getAsDouble() > 0) {
+                    usingDistance = false;
+                    return fixedAutoRpm.getAsDouble();
+                }
                 double distance = distanceSupplier.getAsDouble();
                 double rpm = Double.NaN;
                 if (!Double.isNaN(distance)) {
@@ -278,7 +299,7 @@ public class Shooter extends SubsystemIF {
                 }
                 usingDistance = !Double.isNaN(rpm);
                 if (!usingDistance) rpm = DEFAULT_RPM;
-                return Math.max(MIN_RPM, Math.min(MAX_RPM, rpm + SHOT_RPM_OFFSET + trimRpm + lowVoltageBoostRpm()));
+                return Math.max(MIN_RPM, Math.min(MAX_RPM, rpm + SHOT_RPM_OFFSET + extraRpm.getAsDouble() + trimRpm + lowVoltageBoostRpm()));
             case OFF:
             default:
                 usingDistance = false;
@@ -294,6 +315,7 @@ public class Shooter extends SubsystemIF {
         double raw = readRpm();
         double alpha = Math.max(0, Math.min(0.95, VELOCITY_FILTER));
         measuredRpm = alpha * measuredRpm + (1 - alpha) * raw;
+        sideRpmDiff = alpha * sideRpmDiff + (1 - alpha) * (rawRightRpm - rawLeftRpm);
 
         targetRpm = computeTarget();
         double power = 0;
@@ -332,14 +354,22 @@ public class Shooter extends SubsystemIF {
                 } else if (error < -2 * SHOOTER_VELOCITY_TOLERANCE) {
                     power = -Math.abs(MAX_SLOWDOWN_POWER);
                 }
+                // During an auto volley, recover gently so the speed doesn't overshoot between balls
+                if (feedLatched) power = Math.min(power, feedforward + VOLLEY_MAX_EXTRA_POWER);
             }
             power = Math.max(-Math.abs(MAX_SLOWDOWN_POWER), Math.min(1, power));
         }
 
         setBrake(!isSpinning());
 
-        rightShooterMotor.setPower(power);
-        leftShooterMotor.setPower(power);
+        // In auto, nudge the two sides toward the same speed (plus the right-side trim)
+        double balance = 0;
+        if (!forcedFeedAllowed && mode == Mode.AUTO && power > 0 && !encoderDead && !encoderMismatch) {
+            balance = SIDE_BALANCE_P * (AUTO_RIGHT_RPM_TRIM - sideRpmDiff);
+            balance = Math.max(-SIDE_BALANCE_MAX_POWER, Math.min(SIDE_BALANCE_MAX_POWER, balance));
+        }
+        rightShooterMotor.setPower(Math.min(1, power + balance));
+        leftShooterMotor.setPower(Math.min(1, power - balance));
         lastPower = power;
 
         boolean nowInTolerance = targetRpm > 0 && Math.abs(targetRpm - measuredRpm) <= SHOOTER_VELOCITY_TOLERANCE;
@@ -349,9 +379,14 @@ public class Shooter extends SubsystemIF {
         if (!feedRequested || !isSpinning()) {
             feeding = false;
             feedForced = false;
+            feedLatched = false;
+        } else if (feedLatched) {
+            feeding = true;
         } else if (!GATE_FEED_ON_SPEED) {
             feeding = true;
         } else if (atTargetVelocity() && feedPermission.getAsBoolean()) {
+            // In auto, once the first ball goes keep feeding until the volley ends
+            if (!forcedFeedAllowed && mode == Mode.AUTO) feedLatched = true;
             feeding = true;
             feedForced = false;
         } else if (feedForced) {
@@ -360,12 +395,12 @@ public class Shooter extends SubsystemIF {
             feeding = false;
         }
 
-        if (feedRequested && isSpinning() && !feeding && feedRequestTimer.milliseconds() > FEED_GATE_TIMEOUT_MS) {
+        if (forcedFeedAllowed && feedRequested && isSpinning() && !feeding && feedRequestTimer.milliseconds() > FEED_GATE_TIMEOUT_MS) {
             feeding = true;
             feedForced = true;
         }
         if (feeding && !feedForced) feedRequestTimer.reset();
-        double servoPower = feeding ? SERVO_POWER : 0;
+        double servoPower = feeding ? (feedLatched ? VOLLEY_SERVO_POWER : SERVO_POWER) : 0;
         rightIntakeServo.setPower(servoPower);
         leftIntakeServo.setPower(servoPower);
 

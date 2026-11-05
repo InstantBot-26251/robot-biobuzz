@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
+import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.command.Commands;
 import com.seattlesolvers.solverslib.command.Robot;
 import com.seattlesolvers.solverslib.command.Subsystem;
@@ -57,6 +58,7 @@ public class RobotContainer extends Robot {
     private boolean teleop = false;
     private boolean wasShooterReady = false;
     private boolean wasAimLocked = false;
+    private final ElapsedTime aimSettledTimer = new ElapsedTime();
 
     public RobotContainer(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
         reset();
@@ -104,7 +106,11 @@ public class RobotContainer extends Robot {
             s.autonomousInit();
         }
 
-        shooter.setFeedPermission(() -> !AutoConstants.AUTO_AIM || aimLocked());
+        // In auto, never fire off target or under speed: a held ball beats a missed one
+        shooter.setForcedFeedAllowed(false);
+        shooter.setFixedAutoRpm(() -> AutoConstants.AUTO_SHOT_RPM);
+        shooter.setExtraRpm(() -> AutoConstants.AUTO_RPM_OFFSET);
+        shooter.setFeedPermission(() -> !AutoConstants.AUTO_AIM || aimSettled());
     }
 
     public void teleopInit() {
@@ -172,6 +178,15 @@ public class RobotContainer extends Robot {
         return !Double.isNaN(error) && Math.abs(error) <= DriveConstants.AIM_FEED_TOLERANCE_DEG;
     }
 
+    private boolean aimSteady() {
+        return aimLocked() && Math.abs(chassis.getAngularVelocity()) < Math.toRadians(AutoConstants.AIM_SETTLE_MAX_DEG_PER_SEC);
+    }
+
+    // On target and not turning for a moment, so the target isn't still based on frames from the spin
+    private boolean aimSettled() {
+        return aimSteady() && aimSettledTimer.milliseconds() >= AutoConstants.AIM_SETTLE_MS;
+    }
+
     private boolean readyToShoot() {
         return shooter.atTargetVelocity()
                 && (shooter.isFixedRpmHeld() || limelight.getLiveTagCount() >= VisionConstants.READY_MIN_TAGS)
@@ -219,17 +234,34 @@ public class RobotContainer extends Robot {
         boolean useAim = AutoConstants.AUTO_AIM;
         Command shooting = Commands.sequence(
                 Commands.race(
-                        Commands.waitUntil(() -> shooter.atTargetVelocity() && (!useAim || aimLocked())),
+                        Commands.waitUntil(() -> shooter.atTargetVelocity() && (!useAim || aimSettled())),
                         Commands.waitMillis(ShooterConstants.SPIN_UP_TIME_MS)),
                 ShooterCommands.shoot(shooter),
                 Commands.waitMillis(shootTime),
                 ShooterCommands.disableShooter(shooter));
+        if (!useAim) {
+            return Commands.sequence(
+                    ShooterCommands.enableShooter(shooter),
+                    Commands.race(
+                            Commands.waitUntil(limelight::hasTarget),
+                            Commands.waitMillis(AutoConstants.TARGET_WAIT_TIME)),
+                    shooting);
+        }
+        // Spin until a tag is seen. If the time runs out, don't fire in a random direction
         return Commands.sequence(
                 ShooterCommands.enableShooter(shooter),
                 Commands.race(
-                        Commands.waitUntil(limelight::hasTarget),
-                        Commands.waitMillis(AutoConstants.TARGET_WAIT_TIME)),
-                useAim ? Commands.race(aim(), shooting) : shooting);
+                        Commands.waitUntil(limelight::isLive),
+                        Commands.waitMillis(AutoConstants.TARGET_SEARCH_TIME),
+                        spin(AutoConstants.TARGET_SEARCH_TURN_POWER)),
+                new ConditionalCommand(
+                        Commands.race(aim(), shooting),
+                        ShooterCommands.disableShooter(shooter),
+                        limelight::isLive));
+    }
+
+    private Command spin(double turnPower) {
+        return ChassisCommands.createTeleopDriveCommand(chassis, limelight, () -> 0, () -> 0, () -> turnPower, () -> false);
     }
 
     public Command shootFor(long shootTime) {
@@ -267,6 +299,7 @@ public class RobotContainer extends Robot {
             hub.clearBulkCache();
         }
 
+        if (!aimSteady()) aimSettledTimer.reset();
         run();
         if (teleop) rumbleFeedback();
 

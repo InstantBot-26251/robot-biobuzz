@@ -29,9 +29,7 @@ public class BlueAlliance1StraightShoot extends AutoFactory {
     }
 
     private final Pose start = mirror(56.9587, 9.447, 90);
-    private final Pose forward = mirror(56.9587, 15.447, 90);
-
-    private final Pose point1 = facingBlueHive(FIELD_SIZE_IN - 56.9587, FIELD_SIZE_IN - 22.7419);
+    private final Pose point1 = facingBlueHive(FIELD_SIZE_IN - 56.9587, FIELD_SIZE_IN - 18.447);
     private final Pose point2 = mirror(70.6855, 47.484, 60.9389);
     private final Pose point3 = mirror(70.1692, 94.8227, 90.6249);
     private final Pose point4 = mirror(46.5804, 118.831, 134.495);
@@ -46,11 +44,7 @@ public class BlueAlliance1StraightShoot extends AutoFactory {
     }
 
     public Path driveForward() {
-        return Paths.line(start, forward).constant(start);
-    }
-
-    public Path path1() {
-        return Paths.line(forward, point1).linear(forward, point1);
+        return Paths.line(start, point1).constant(start);
     }
 
     public Path park() {
@@ -85,7 +79,6 @@ public class BlueAlliance1StraightShoot extends AutoFactory {
         return Commands.sequence(
                 robot.enableShooter(),
                 robot.followPath(driveForward()),
-                robot.followPath(path1()),
                 robot.aimAndShoot(AutoConstants.SHOOT_TIME),
                 robot.followPath(park())
         );
