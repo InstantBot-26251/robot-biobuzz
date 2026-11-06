@@ -76,7 +76,7 @@ public class RedAllianceClosePark extends AutoFactory {
                 robot.enableShooter(),
                 robot.followPath(driveForward()),
                 robot.aimAndShoot(AutoConstants.SHOOT_TIME),
-                robot.followPath(path1()),
+                //robot.followPath(path1()),
                 robot.followPath(park())
         );
     }

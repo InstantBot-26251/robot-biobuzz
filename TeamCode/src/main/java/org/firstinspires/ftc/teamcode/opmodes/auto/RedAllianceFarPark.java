@@ -32,8 +32,9 @@ public class RedAllianceFarPark extends AutoFactory {
     private final Pose start = poseFactory.of(56.9587, 9.447, 90);
     private final Pose point1 = new Pose(56.9587, 21.447, Math.atan2(
             VisionConstants.RED_HIVE_Y_IN - 21.447, VisionConstants.HIVE_CENTER_X_IN - 56.9587));
-    private final Pose point2 = poseFactory.of(70.6855, 47.484, 60.9389);
-    private final Pose point3 = poseFactory.of(70.1692, 94.8227, 90.6249);
+    // Kept 10 in left of the original line so the robot clears the hive
+    private final Pose point2 = poseFactory.of(60.6855, 47.484, 60.9389);
+    private final Pose point3 = poseFactory.of(60.1692, 94.8227, 90.6249);
     private final Pose point4 = poseFactory.of(46.5804, 118.831, 134.495);
     private final Pose point5 = poseFactory.of(12, 116, -170.274);
 
