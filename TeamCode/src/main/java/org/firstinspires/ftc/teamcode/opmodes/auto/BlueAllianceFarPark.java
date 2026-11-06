@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.vision.VisionConstants;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name = "Blue Alliance Straight Shoot-D,6")
+@Autonomous(name = "Blue Alliance Far Park-D,6")
 public class BlueAllianceFarPark extends AutoFactory {
     private static final double FIELD_SIZE_IN = 144;
 
@@ -29,11 +29,11 @@ public class BlueAllianceFarPark extends AutoFactory {
     }
 
     private final Pose start = mirror(56.9587, 9.447, 90);
-    private final Pose point1 = facingBlueHive(FIELD_SIZE_IN - 56.9587, FIELD_SIZE_IN - 18.447);
+    private final Pose point1 = facingBlueHive(FIELD_SIZE_IN - 56.9587, FIELD_SIZE_IN - 21.447);
     private final Pose point2 = mirror(70.6855, 47.484, 60.9389);
     private final Pose point3 = mirror(70.1692, 94.8227, 90.6249);
     private final Pose point4 = mirror(46.5804, 118.831, 134.495);
-    private final Pose point5 = mirror(18.6337, 113.1839, -170.274);
+    private final Pose point5 = mirror(12, 116, -170.274);
 
     private Pose mirror(double redX, double redY, double redHeadingDeg) {
         return poseFactory.of(FIELD_SIZE_IN - redX, FIELD_SIZE_IN - redY, redHeadingDeg + 180);

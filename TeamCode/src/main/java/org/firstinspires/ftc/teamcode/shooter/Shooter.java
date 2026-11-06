@@ -58,6 +58,7 @@ public class Shooter extends SubsystemIF {
     private DoubleSupplier fixedAutoRpm = () -> 0;
     private DoubleSupplier extraRpm = () -> 0;
     private boolean feedLatched = false;
+    private boolean feedOverride = false;
 
     private double targetRpm = 0;
     private double measuredRpm = 0;
@@ -214,10 +215,17 @@ public class Shooter extends SubsystemIF {
     public void stopShooter() {
         mode = Mode.OFF;
         feedRequested = false;
+        feedOverride = false;
     }
 
     public void stopServos() {
         feedRequested = false;
+        feedOverride = false;
+    }
+
+    // Runs the feed wheels no matter what the speed checks say (used for the timed auto feed)
+    public void setFeedOverride(boolean on) {
+        feedOverride = on;
     }
 
     public Mode getMode() {
@@ -376,7 +384,9 @@ public class Shooter extends SubsystemIF {
         if (nowInTolerance && !inTolerance) inToleranceTimer.reset();
         inTolerance = nowInTolerance;
 
-        if (!feedRequested || !isSpinning()) {
+        if (feedOverride && isSpinning()) {
+            feeding = true;
+        } else if (!feedRequested || !isSpinning()) {
             feeding = false;
             feedForced = false;
             feedLatched = false;

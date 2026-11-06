@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.vision.VisionConstants;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name = "Red Alliance Straight Shoot-C,1")
+@Autonomous(name = "Red Alliance Far Park-C,1")
 public class RedAllianceFarPark extends AutoFactory {
 
     @Override
@@ -30,12 +30,12 @@ public class RedAllianceFarPark extends AutoFactory {
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
     private final Pose start = poseFactory.of(56.9587, 9.447, 90);
-    private final Pose point1 = new Pose(56.9587, 18.447, Math.atan2(
-            VisionConstants.RED_HIVE_Y_IN - 18.447, VisionConstants.HIVE_CENTER_X_IN - 56.9587));
+    private final Pose point1 = new Pose(56.9587, 21.447, Math.atan2(
+            VisionConstants.RED_HIVE_Y_IN - 21.447, VisionConstants.HIVE_CENTER_X_IN - 56.9587));
     private final Pose point2 = poseFactory.of(70.6855, 47.484, 60.9389);
     private final Pose point3 = poseFactory.of(70.1692, 94.8227, 90.6249);
     private final Pose point4 = poseFactory.of(46.5804, 118.831, 134.495);
-    private final Pose point5 = poseFactory.of(18.6337, 113.1839, -170.274);
+    private final Pose point5 = poseFactory.of(12, 116, -170.274);
 
     public Path driveForward() {
         return Paths.line(start, point1).constant(start);

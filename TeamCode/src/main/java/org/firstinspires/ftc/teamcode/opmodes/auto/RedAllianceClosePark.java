@@ -10,12 +10,11 @@ import com.seattlesolvers.solverslib.command.Commands;
 
 import org.firstinspires.ftc.teamcode.opmodes.Alliance;
 import org.firstinspires.ftc.teamcode.util.AutoFactory;
-import org.firstinspires.ftc.teamcode.vision.VisionConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name = "Red Alliance Close Park")
+@Autonomous(name = "Red Alliance Close Park-C,1")
 public class RedAllianceClosePark extends AutoFactory {
 
     @Override
@@ -32,10 +31,9 @@ public class RedAllianceClosePark extends AutoFactory {
     private final Pose start = poseFactory.of(57.5689, 7.6078, 90);
     private final Pose forward = poseFactory.of(57.5689, 13.6078, 90);
 
-    private final Pose point1 = new Pose(56, 31.2931, Math.atan2(
-            VisionConstants.RED_HIVE_Y_IN - 31.2931, VisionConstants.HIVE_CENTER_X_IN - 56));
+    private final Pose point1 = new Pose(56, 31.2931, Math.atan2(32.8009 - 31.2931, 22.5047 - 56));
     private final Pose point2 = poseFactory.of(22.5047, 32.8009, 177.4226);
-    private final Pose point3 = poseFactory.of(10.5414, 92.8134, 101.2739);
+    private final Pose point3 = poseFactory.of(7, 92.8134, 101.2739);
 
     public Path driveForward() {
         return Paths.line(start, forward).constant(start);
@@ -77,8 +75,8 @@ public class RedAllianceClosePark extends AutoFactory {
         return Commands.sequence(
                 robot.enableShooter(),
                 robot.followPath(driveForward()),
-                robot.followPath(path1()),
                 robot.aimAndShoot(AutoConstants.SHOOT_TIME),
+                robot.followPath(path1()),
                 robot.followPath(park())
         );
     }

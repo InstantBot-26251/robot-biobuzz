@@ -59,6 +59,8 @@ public class RobotContainer extends Robot {
     private boolean wasShooterReady = false;
     private boolean wasAimLocked = false;
     private final ElapsedTime aimSettledTimer = new ElapsedTime();
+    private boolean secondGroup = false;
+    private final ElapsedTime shooterSteadyTimer = new ElapsedTime();
 
     public RobotContainer(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
         reset();
@@ -109,7 +111,8 @@ public class RobotContainer extends Robot {
         // In auto, never fire off target or under speed: a held ball beats a missed one
         shooter.setForcedFeedAllowed(false);
         shooter.setFixedAutoRpm(() -> AutoConstants.AUTO_SHOT_RPM);
-        shooter.setExtraRpm(() -> AutoConstants.AUTO_RPM_OFFSET);
+        shooter.setExtraRpm(() -> AutoConstants.AUTO_RPM_OFFSET
+                + (secondGroup ? AutoConstants.SECOND_GROUP_EXTRA_RPM : 0));
         shooter.setFeedPermission(() -> !AutoConstants.AUTO_AIM || aimSettled());
     }
 
@@ -187,6 +190,16 @@ public class RobotContainer extends Robot {
         return aimSteady() && aimSettledTimer.milliseconds() >= AutoConstants.AIM_SETTLE_MS;
     }
 
+    private boolean shooterOnSpeed() {
+        return shooter.getTargetRpm() > 0
+                && Math.abs(shooter.getTargetRpm() - shooter.getShooterRpm()) <= ShooterConstants.SHOOTER_VELOCITY_TOLERANCE;
+    }
+
+    // Shooter has held its target speed for a while, so it's done swinging after the last shot
+    private boolean shooterSteady() {
+        return shooterOnSpeed() && shooterSteadyTimer.milliseconds() >= AutoConstants.GROUP2_STEADY_MS;
+    }
+
     private boolean readyToShoot() {
         return shooter.atTargetVelocity()
                 && (shooter.isFixedRpmHeld() || limelight.getLiveTagCount() >= VisionConstants.READY_MIN_TAGS)
@@ -247,6 +260,30 @@ public class RobotContainer extends Robot {
                             Commands.waitMillis(AutoConstants.TARGET_WAIT_TIME)),
                     shooting);
         }
+        // Feed, pause so the shooter recovers, then feed the rest
+        Command timedShooting = Commands.sequence(
+                Commands.runOnce(() -> secondGroup = false),
+                Commands.race(
+                        Commands.waitUntil(() -> shooter.atTargetVelocity() && aimSettled()),
+                        Commands.waitMillis(ShooterConstants.SPIN_UP_TIME_MS)),
+                Commands.runOnce(() -> shooter.setFeedOverride(true)),
+                Commands.waitMillis(AutoConstants.FIRST_FEED_TIME_MS),
+                // Group 2 gets its own speed; switching now lets the shooter reach it during the pause
+                Commands.runOnce(() -> {
+                    shooter.setFeedOverride(false);
+                    secondGroup = true;
+                }),
+                Commands.waitMillis(AutoConstants.FEED_PAUSE_TIME_MS),
+                // Don't start group 2 until the speed has settled after group 1
+                Commands.race(
+                        Commands.waitUntil(this::shooterSteady),
+                        Commands.waitMillis(AutoConstants.GROUP2_MAX_WAIT_MS)),
+                Commands.runOnce(() -> shooter.setFeedOverride(true)),
+                Commands.waitMillis(AutoConstants.SECOND_FEED_TIME_MS),
+                Commands.runOnce(() -> shooter.setFeedOverride(false)),
+                // Keep the wheels at speed so the last balls still in the feed get shot
+                Commands.waitMillis(AutoConstants.SPIN_AFTER_FEED_MS),
+                ShooterCommands.disableShooter(shooter));
         // Spin until a tag is seen. If the time runs out, don't fire in a random direction
         return Commands.sequence(
                 ShooterCommands.enableShooter(shooter),
@@ -255,7 +292,7 @@ public class RobotContainer extends Robot {
                         Commands.waitMillis(AutoConstants.TARGET_SEARCH_TIME),
                         spin(AutoConstants.TARGET_SEARCH_TURN_POWER)),
                 new ConditionalCommand(
-                        Commands.race(aim(), shooting),
+                        Commands.race(aim(), timedShooting),
                         ShooterCommands.disableShooter(shooter),
                         limelight::isLive));
     }
@@ -300,6 +337,7 @@ public class RobotContainer extends Robot {
         }
 
         if (!aimSteady()) aimSettledTimer.reset();
+        if (!shooterOnSpeed()) shooterSteadyTimer.reset();
         run();
         if (teleop) rumbleFeedback();
 

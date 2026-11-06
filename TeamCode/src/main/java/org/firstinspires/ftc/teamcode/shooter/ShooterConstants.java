@@ -55,7 +55,7 @@ public class ShooterConstants {
 
     public static double SERVO_POWER = 0.75;
     public static double VOLLEY_SERVO_POWER = 0.5;
-    public static double VOLLEY_MAX_EXTRA_POWER = 0.1;
+    public static double VOLLEY_MAX_EXTRA_POWER = 0.05;
     public static double MANUAL_TRIM_STEP_RPM = 100;
 
     public enum VelocitySource { RIGHT, LEFT, AVERAGE }
