@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.pedropathing.api.Paths;
-import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -15,29 +14,36 @@ import org.firstinspires.ftc.teamcode.vision.VisionConstants;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name = "Red Alliance Straight Shoot-C,1")
-public class RedAlliance1StraightShoot extends AutoFactory {
+@Autonomous(name = "Blue Alliance Straight Shoot-D,6")
+public class BlueAllianceFarPark extends AutoFactory {
+    private static final double FIELD_SIZE_IN = 144;
 
     @Override
     protected Pose setStartPose() {
-        return poseFactory.of(56.9587, 9.447, 90);
+        return mirror(56.9587, 9.447, 90);
     }
 
     @Override
     protected Alliance getAlliance() {
-        return Alliance.RED;
+        return Alliance.BLUE;
     }
-    private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = poseFactory.of(56.9587, 9.447, 90);
-    private final Pose forward = poseFactory.of(56.9587, 15.447, 90);
+    private final Pose start = mirror(56.9587, 9.447, 90);
+    private final Pose forward = mirror(56.9587, 15.447, 90);
 
-    private final Pose point1 = new Pose(56.9587, 22.7419, Math.atan2(
-            VisionConstants.RED_HIVE_Y_IN - 22.7419, VisionConstants.HIVE_CENTER_X_IN - 56.9587));
-    private final Pose point2 = poseFactory.of(70.6855, 47.484, 60.9389);
-    private final Pose point3 = poseFactory.of(70.1692, 94.8227, 90.6249);
-    private final Pose point4 = poseFactory.of(46.5804, 118.831, 134.495);
-    private final Pose point5 = poseFactory.of(18.6337, 113.1839, -170.274);
+    private final Pose point1 = facingBlueHive(FIELD_SIZE_IN - 56.9587, FIELD_SIZE_IN - 22.7419);
+    private final Pose point2 = mirror(70.6855, 47.484, 60.9389);
+    private final Pose point3 = mirror(70.1692, 94.8227, 90.6249);
+    private final Pose point4 = mirror(46.5804, 118.831, 134.495);
+    private final Pose point5 = mirror(18.6337, 113.1839, -170.274);
+
+    private Pose mirror(double redX, double redY, double redHeadingDeg) {
+        return poseFactory.of(FIELD_SIZE_IN - redX, FIELD_SIZE_IN - redY, redHeadingDeg + 180);
+    }
+
+    private static Pose facingBlueHive(double x, double y) {
+        return new Pose(x, y, Math.atan2(VisionConstants.BLUE_HIVE_Y_IN - y, VisionConstants.HIVE_CENTER_X_IN - x));
+    }
 
     public Path driveForward() {
         return Paths.line(start, forward).constant(start);

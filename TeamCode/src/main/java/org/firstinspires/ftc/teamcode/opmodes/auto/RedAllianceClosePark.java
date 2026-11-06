@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.pedropathing.api.Paths;
+import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -14,36 +15,27 @@ import org.firstinspires.ftc.teamcode.vision.VisionConstants;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name = "Blue Alliance Straight Shoot-D,6")
-public class BlueAlliance1StraightShoot extends AutoFactory {
-    private static final double FIELD_SIZE_IN = 144;
+@Autonomous(name = "Red Alliance Close Park")
+public class RedAllianceClosePark extends AutoFactory {
 
     @Override
     protected Pose setStartPose() {
-        return mirror(56.9587, 9.447, 90);
+        return poseFactory.of(57.5689, 7.6078, 90);
     }
 
     @Override
     protected Alliance getAlliance() {
-        return Alliance.BLUE;
+        return Alliance.RED;
     }
+    private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = mirror(56.9587, 9.447, 90);
-    private final Pose forward = mirror(56.9587, 15.447, 90);
+    private final Pose start = poseFactory.of(57.5689, 7.6078, 90);
+    private final Pose forward = poseFactory.of(57.5689, 13.6078, 90);
 
-    private final Pose point1 = facingBlueHive(FIELD_SIZE_IN - 56.9587, FIELD_SIZE_IN - 22.7419);
-    private final Pose point2 = mirror(70.6855, 47.484, 60.9389);
-    private final Pose point3 = mirror(70.1692, 94.8227, 90.6249);
-    private final Pose point4 = mirror(46.5804, 118.831, 134.495);
-    private final Pose point5 = mirror(18.6337, 113.1839, -170.274);
-
-    private Pose mirror(double redX, double redY, double redHeadingDeg) {
-        return poseFactory.of(FIELD_SIZE_IN - redX, FIELD_SIZE_IN - redY, redHeadingDeg + 180);
-    }
-
-    private static Pose facingBlueHive(double x, double y) {
-        return new Pose(x, y, Math.atan2(VisionConstants.BLUE_HIVE_Y_IN - y, VisionConstants.HIVE_CENTER_X_IN - x));
-    }
+    private final Pose point1 = new Pose(56, 31.2931, Math.atan2(
+            VisionConstants.RED_HIVE_Y_IN - 31.2931, VisionConstants.HIVE_CENTER_X_IN - 56));
+    private final Pose point2 = poseFactory.of(22.5047, 32.8009, 177.4226);
+    private final Pose point3 = poseFactory.of(10.5414, 92.8134, 101.2739);
 
     public Path driveForward() {
         return Paths.line(start, forward).constant(start);
@@ -54,7 +46,7 @@ public class BlueAlliance1StraightShoot extends AutoFactory {
     }
 
     public Path park() {
-        return roundedPath(CORNER_RADIUS_IN, point1, point2, point3, point4, point5);
+        return roundedPath(CORNER_RADIUS_IN, point1, point2, point3);
     }
 
     private static final double CORNER_RADIUS_IN = 8;
