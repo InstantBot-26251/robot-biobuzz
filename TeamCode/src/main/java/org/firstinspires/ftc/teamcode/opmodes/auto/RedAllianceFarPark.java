@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Autonomous(name = "Red Alliance Straight Shoot-C,1")
-public class RedAlliance1StraightShoot extends AutoFactory {
+public class RedAllianceFarPark extends AutoFactory {
 
     @Override
     protected Pose setStartPose() {
