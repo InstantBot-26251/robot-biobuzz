@@ -26,6 +26,7 @@ public class DriveConstants {
     public static double RUNAWAY_MIN_POWER = 0.3;
 
     public static long PATH_TIMEOUT_MS = 6000;
+    public static double PATH_TIMEOUT_MIN_SPEED = 15;
 
     public static boolean DRAW_FIELD = true;
 }

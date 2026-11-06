@@ -14,39 +14,27 @@ import org.firstinspires.ftc.teamcode.util.AutoFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-// Same as RedAllianceClosePark, with every pose mirrored across x = 70.75
 @Autonomous(name = "Blue Alliance Close Park-D,6")
 public class BlueAllianceClosePark extends AutoFactory {
 
     @Override
     protected Pose setStartPose() {
-        return poseFactory.of(57.5689, 7.6078, 90);
+        return start;
     }
 
     @Override
     protected Alliance getAlliance() {
         return Alliance.BLUE;
     }
-    private final PoseFactory poseFactory = PoseFactory.degrees().mirrorX(70.75);
+    private final PoseFactory poseFactory = PoseFactory.degrees().mirrorAroundPoint(72, 72);
 
-    private final Pose start = poseFactory.of(57.5689, 7.6078, 90);
-    private final Pose forward = poseFactory.of(57.5689, 13.6078, 90);
-
-    private final Pose point2 = poseFactory.of(22.5047, 32.8009, 177.4226);
-    // Arrive already facing point2, so the park path doesn't start with a big turn while moving
-    private final Pose point1 = facing(poseFactory.of(56, 31.2931, 90), point2);
-    private final Pose point3 = poseFactory.of(7, 92.8134, 101.2739);
-
-    private static Pose facing(Pose from, Pose to) {
-        return new Pose(from.x(), from.y(), Math.atan2(to.y() - from.y(), to.x() - from.x()));
-    }
+    private final Pose start = poseFactory.of(57.5009, 8.2573, 90);
+    private final Pose point1 = poseFactory.of(57.6295, 30.6036, 90);
+    private final Pose point2 = poseFactory.of(19.0394, 30.9228, 179.5261);
+    private final Pose point3 = poseFactory.of(10.6206, 92.6388, 97.7678);
 
     public Path driveForward() {
-        return Paths.line(start, forward).constant(start);
-    }
-
-    public Path path1() {
-        return Paths.line(forward, point1).linear(forward, point1);
+        return Paths.line(start, point1).constant(start);
     }
 
     public Path park() {
@@ -82,7 +70,6 @@ public class BlueAllianceClosePark extends AutoFactory {
                 robot.enableShooter(),
                 robot.followPath(driveForward()),
                 robot.aimAndShoot(AutoConstants.SHOOT_TIME),
-                robot.followPath(path1()),
                 robot.followPath(park())
         );
     }

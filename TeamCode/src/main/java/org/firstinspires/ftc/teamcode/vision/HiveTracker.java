@@ -250,14 +250,12 @@ public class HiveTracker {
         if (SIMPLE_TRACKING) {
             int[] count = new int[2];
             for (Sighting s : ours) count[s.cell]++;
-            double[] cellHeight = {cellHeightAboveCamera(ours, 0), cellHeightAboveCamera(ours, 1)};
+            double[] cellHeight = {cellHeightAboveCamera(ours, 0, MIN_LEARN_SPACING_IN), cellHeightAboveCamera(ours, 1, MIN_LEARN_SPACING_IN)};
             int cell;
             double learned = measuredUpHeightAboveCamera();
             if (Double.isNaN(learned)) learned = SIMPLE_TAG_HEIGHT_IN - CAMERA_HEIGHT_IN;
             double lowBelow = learned - 0.7 * (UP_CELL_TAG_HEIGHT_IN - DOWN_CELL_TAG_HEIGHT_IN);
-            if (!Double.isNaN(cellHeight[0]) && !Double.isNaN(cellHeight[1])) {
-                cell = cellHeight[0] >= cellHeight[1] ? 0 : 1;
-            } else if (count[0] > 0 && count[1] > 0) {
+            if (count[0] > 0 && count[1] > 0) {
                 double[] elevation = new double[2];
                 for (Sighting s : ours) elevation[s.cell] += s.elevation / count[s.cell];
                 cell = elevation[0] >= elevation[1] ? 0 : 1;

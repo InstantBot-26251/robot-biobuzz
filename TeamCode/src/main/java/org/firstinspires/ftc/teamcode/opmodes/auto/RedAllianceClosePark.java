@@ -19,7 +19,7 @@ public class RedAllianceClosePark extends AutoFactory {
 
     @Override
     protected Pose setStartPose() {
-        return poseFactory.of(57.5689, 7.6078, 90);
+        return start;
     }
 
     @Override
@@ -28,19 +28,13 @@ public class RedAllianceClosePark extends AutoFactory {
     }
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = poseFactory.of(57.5689, 7.6078, 90);
-    private final Pose forward = poseFactory.of(57.5689, 13.6078, 90);
-
-    private final Pose point1 = new Pose(56, 31.2931, Math.atan2(32.8009 - 31.2931, 22.5047 - 56));
-    private final Pose point2 = poseFactory.of(22.5047, 32.8009, 177.4226);
-    private final Pose point3 = poseFactory.of(7, 92.8134, 101.2739);
+    private final Pose start = poseFactory.of(57.5009, 8.2573, 90);
+    private final Pose point1 = poseFactory.of(57.6295, 30.6036, 90);
+    private final Pose point2 = poseFactory.of(19.0394, 30.9228, 179.5261);
+    private final Pose point3 = poseFactory.of(10.6206, 92.6388, 97.7678);
 
     public Path driveForward() {
-        return Paths.line(start, forward).constant(start);
-    }
-
-    public Path path1() {
-        return Paths.line(forward, point1).linear(forward, point1);
+        return Paths.line(start, point1).constant(start);
     }
 
     public Path park() {
@@ -76,7 +70,6 @@ public class RedAllianceClosePark extends AutoFactory {
                 robot.enableShooter(),
                 robot.followPath(driveForward()),
                 robot.aimAndShoot(AutoConstants.SHOOT_TIME),
-                //robot.followPath(path1()),
                 robot.followPath(park())
         );
     }
