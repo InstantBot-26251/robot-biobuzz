@@ -28,7 +28,7 @@ public class RedAllianceClosePark extends AutoFactory {
     }
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = poseFactory.of(57.5009, 8.2573, 90);
+    private final Pose start = poseFactory.of(57.5009, 5, 90);
     private final Pose point1 = poseFactory.of(57.6295, 30.6036, 90);
     private final Pose point2 = poseFactory.of(19.0394, 30.9228, 179.5261);
     private final Pose point3 = poseFactory.of(10.6206, 92.6388, 97.7678);

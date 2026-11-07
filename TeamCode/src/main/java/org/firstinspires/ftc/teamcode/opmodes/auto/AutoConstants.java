@@ -8,7 +8,7 @@ public class AutoConstants {
     // 0 = use Limelight distance and the shot table. Above 0 = always shoot at this RPM
     public static double AUTO_SHOT_RPM = 0;
     public static double AUTO_RPM_OFFSET = 50;
-    public static double SECOND_GROUP_EXTRA_RPM = -20;
+    public static double SECOND_GROUP_EXTRA_RPM = -10;
     public static long GROUP2_STEADY_MS = 1000;
     public static long GROUP2_MAX_WAIT_MS = 4000;
     public static long SHOOT_TIME = 5000;
