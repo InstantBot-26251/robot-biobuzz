@@ -34,7 +34,7 @@ public class BlueAllianceFarPark extends AutoFactory {
     private final Pose point2 = mirror(60.6855, 47.484, 60.9389);
     private final Pose point3 = mirror(60.1692, 94.8227, 90.6249);
     private final Pose point4 = mirror(46.5804, 105, 134.495);
-    private final Pose point5 = mirror(12, 116, -170.274);
+    private final Pose point5 = mirror(16, 116, -170.274);
 
     private Pose mirror(double redX, double redY, double redHeadingDeg) {
         return poseFactory.of(FIELD_SIZE_IN - redX, FIELD_SIZE_IN - redY, redHeadingDeg + 180);
