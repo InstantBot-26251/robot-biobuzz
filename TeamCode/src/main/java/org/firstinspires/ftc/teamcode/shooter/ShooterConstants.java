@@ -7,7 +7,18 @@ public class ShooterConstants {
     public static double[] SHOT_DISTANCES_IN = {};
     public static double[] SHOT_RPMS = {};
 
-    public static double DEFAULT_RPM = 4500;
+    public static double DEFAULT_RPM = 3000;
+
+    public static double SHOT_RPM_OFFSET = 0;
+
+    public static double FIXED_RPM = 3000;
+    public static double FIXED_RPM_STEP = 100;
+
+    public static long SPIN_UP_TIME_MS = 1500;
+
+    public static boolean VOLTAGE_COMPENSATION = true;
+    public static double LOW_VOLTAGE_THRESHOLD = 11.5;
+    public static double LOW_VOLTAGE_RPM_PER_VOLT = 100;
 
     public static double MAX_EXTRAPOLATE_IN = 8;
 
@@ -20,12 +31,12 @@ public class ShooterConstants {
     public static double SHOOTER_KV = 1.0 / 5800.0;
     public static double SHOOTER_KS = 0.02;
     public static double SHOOTER_P = 0.0006;
-    public static double SHOOTER_I = 0.0;
+    public static double SHOOTER_I = 0.0003;
     public static double SHOOTER_I_MAX_POWER = 0.1;
-    public static double SPINUP_BOOST_RPM = 500;
+    public static double SPINUP_BOOST_RPM = 150;
     public static double NOMINAL_VOLTAGE = 12.0;
 
-    public static double SHOOTER_VELOCITY_TOLERANCE = 100;
+    public static double SHOOTER_VELOCITY_TOLERANCE = 75;
     public static long READY_STABLE_MS = 60;
     public static boolean GATE_FEED_ON_SPEED = true;
     public static long FEED_GATE_TIMEOUT_MS = 1000;
@@ -35,11 +46,17 @@ public class ShooterConstants {
 
     public static double MAX_SLOWDOWN_POWER = 0.3;
 
+    public static double SIDE_BALANCE_P = 0.0006;
+    public static double SIDE_BALANCE_MAX_POWER = 0.1;
+    public static double AUTO_RIGHT_RPM_TRIM = 0;
+
     public static double ENCODER_DEAD_RPM = 200;
     public static long ENCODER_DEAD_MS = 1000;
 
     public static double SERVO_POWER = 0.75;
-    public static double MANUAL_TRIM_STEP_RPM = 50;
+    public static double VOLLEY_SERVO_POWER = 0.5;
+    public static double VOLLEY_MAX_EXTRA_POWER = 0.05;
+    public static double MANUAL_TRIM_STEP_RPM = 100;
 
     public enum VelocitySource { RIGHT, LEFT, AVERAGE }
 

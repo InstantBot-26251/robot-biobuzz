@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.pedropathing.api.Paths;
+import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -9,54 +10,35 @@ import com.seattlesolvers.solverslib.command.Commands;
 
 import org.firstinspires.ftc.teamcode.opmodes.Alliance;
 import org.firstinspires.ftc.teamcode.util.AutoFactory;
-import org.firstinspires.ftc.teamcode.vision.VisionConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// Mirror of RedAlliance1StraightShoot, rotated 180 degrees around the field center
-@Autonomous(name = "Blue Alliance Straight Shoot-D,6")
-public class BlueAlliance1StraightShoot extends AutoFactory {
-    private static final double FIELD_SIZE_IN = 144;
+@Autonomous(name = "Blue Alliance Close Park-D,6")
+public class BlueAllianceClosePark extends AutoFactory {
 
     @Override
     protected Pose setStartPose() {
-        return mirror(56.9587, 9.447, 90);
+        return start;
     }
 
     @Override
     protected Alliance getAlliance() {
         return Alliance.BLUE;
     }
+    private final PoseFactory poseFactory = PoseFactory.degrees().mirrorAroundPoint(72, 72);
 
-    private final Pose start = mirror(56.9587, 9.447, 90);
-    private final Pose forward = mirror(56.9587, 15.447, 90);
-    // Face the blue hive when shooting so the Limelight (front of robot) can see the tags
-    private final Pose point1 = facingBlueHive(FIELD_SIZE_IN - 56.9587, FIELD_SIZE_IN - 22.7419);
-    private final Pose point2 = mirror(70.6855, 47.484, 60.9389);
-    private final Pose point3 = mirror(70.1692, 94.8227, 90.6249);
-    private final Pose point4 = mirror(46.5804, 118.831, 134.495);
-    private final Pose point5 = mirror(18.6337, 113.1839, -170.274);
-
-    // Takes a red-side pose and returns the matching blue-side pose
-    private Pose mirror(double redX, double redY, double redHeadingDeg) {
-        return poseFactory.of(FIELD_SIZE_IN - redX, FIELD_SIZE_IN - redY, redHeadingDeg + 180);
-    }
-
-    private static Pose facingBlueHive(double x, double y) {
-        return new Pose(x, y, Math.atan2(VisionConstants.BLUE_HIVE_Y_IN - y, VisionConstants.HIVE_CENTER_X_IN - x));
-    }
+    private final Pose start = poseFactory.of(57.5009, 8.2573, 90);
+    private final Pose point1 = poseFactory.of(57.6295, 30.6036, 90);
+    private final Pose point2 = poseFactory.of(19.0394, 30.9228, 179.5261);
+    private final Pose point3 = poseFactory.of(10.6206, 92.6388, 97.7678);
 
     public Path driveForward() {
-        return Paths.line(start, forward).constant(start);
-    }
-
-    public Path path1() {
-        return Paths.line(forward, point1).linear(forward, point1);
+        return Paths.line(start, point1).constant(start);
     }
 
     public Path park() {
-        return roundedPath(CORNER_RADIUS_IN, point1, point2, point3, point4, point5);
+        return roundedPath(CORNER_RADIUS_IN, point1, point2, point3);
     }
 
     private static final double CORNER_RADIUS_IN = 8;
@@ -82,13 +64,11 @@ public class BlueAlliance1StraightShoot extends AutoFactory {
                 from.y() + (to.y() - from.y()) * d / length, 0);
     }
 
-
     @Override
     protected Command createAutoSequence() {
         return Commands.sequence(
                 robot.enableShooter(),
                 robot.followPath(driveForward()),
-                robot.followPath(path1()),
                 robot.aimAndShoot(AutoConstants.SHOOT_TIME),
                 robot.followPath(park())
         );

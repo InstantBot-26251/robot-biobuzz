@@ -20,7 +20,7 @@ public class Constants {
     public static Follower createAutonomous(HardwareMap h) {
         return new Follower(
                 new OTOSLocalizer(h,localizerConfig),
-                new Mecanum(h, autonomousConfig),
+                new Mecanum(h, teleOpConfig),
                 new Foresight(foresightConfig)
         );
     }
@@ -50,7 +50,7 @@ public class Constants {
             c.frontRightName.set("front_right");
             c.backLeftName.set("back_left");
             c.backRightName.set("back_right");
-            // Same physical motor directions as the mirrored setup, so forward is unchanged
+
             c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
             c.frontRightDirection.set(DcMotorSimple.Direction.REVERSE);
             c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);

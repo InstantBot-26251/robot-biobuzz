@@ -33,6 +33,7 @@ public class Chassis extends SubsystemIF {
     private final RunawayGuard guard = new RunawayGuard();
     private boolean localizationFault = false;
     private String faultReason = "";
+    private String lastPathReport = "-";
 
     public Chassis(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
@@ -72,6 +73,13 @@ public class Chassis extends SubsystemIF {
             return;
         }
         follower.follow(path);
+    }
+
+    public void reportPathEnd(String result, Path path, double seconds) {
+        Pose end = path.endPose();
+        Pose pose = getPose();
+        lastPathReport = String.format(java.util.Locale.US, "%s after %.1f s, %.1f in from its end point",
+                result, seconds, Math.hypot(end.x() - pose.x(), end.y() - pose.y()));
     }
 
     public boolean hasLocalizationFault() {
@@ -202,5 +210,6 @@ public class Chassis extends SubsystemIF {
         telemetry.addData("Pose y", pose.y());
         telemetry.addData("Heading (deg)", Math.toDegrees(pose.heading()));
         telemetry.addData("Is Following Path", isFollowingPath());
+        telemetry.addData("Last Path", lastPathReport);
     }
 }

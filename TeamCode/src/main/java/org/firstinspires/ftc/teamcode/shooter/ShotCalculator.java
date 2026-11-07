@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.shooter;
 import java.util.Arrays;
 
 public final class ShotCalculator {
+    private static final double MERGE_POINTS_WITHIN_IN = 3.0;
+
     private ShotCalculator() {}
 
     public static double rpmForDistance(double distanceIn, double[] distances, double[] rpms,
@@ -18,6 +20,8 @@ public final class ShotCalculator {
         if (count == 0) return Double.NaN;
         points = Arrays.copyOf(points, count);
         Arrays.sort(points, (a, b) -> Double.compare(a[0], b[0]));
+        points = mergeClosePoints(points);
+        count = points.length;
 
         double rpm;
         if (count == 1) {
@@ -38,6 +42,25 @@ public final class ShotCalculator {
             }
         }
         return Math.max(minRpm, Math.min(maxRpm, rpm));
+    }
+
+    private static double[][] mergeClosePoints(double[][] sorted) {
+        double[][] merged = new double[sorted.length][];
+        int count = 0;
+        int i = 0;
+        while (i < sorted.length) {
+            double first = sorted[i][0];
+            double sumDistance = 0, sumRpm = 0;
+            int n = 0;
+            while (i < sorted.length && sorted[i][0] - first <= MERGE_POINTS_WITHIN_IN) {
+                sumDistance += sorted[i][0];
+                sumRpm += sorted[i][1];
+                n++;
+                i++;
+            }
+            merged[count++] = new double[]{sumDistance / n, sumRpm / n};
+        }
+        return Arrays.copyOf(merged, count);
     }
 
     private static double line(double[] a, double[] b, double d) {

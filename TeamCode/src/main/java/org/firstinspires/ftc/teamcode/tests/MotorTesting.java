@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp
-@Configurable
 public class MotorTesting extends OpMode {
     private DcMotorEx motor;
 
