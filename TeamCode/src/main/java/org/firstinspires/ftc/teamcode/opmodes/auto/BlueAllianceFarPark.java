@@ -31,9 +31,10 @@ public class BlueAllianceFarPark extends AutoFactory {
     private final Pose start = mirror(56.9587, 9.447, 90);
     private final Pose point1 = facingBlueHive(FIELD_SIZE_IN - 56.9587, FIELD_SIZE_IN - 21.447);
     // Kept 10 in left of the original line so the robot clears the hive
-    private final Pose point2 = mirror(60.6855, 47.484, 60.9389);
+    private final Pose point2 = mirror(
+            60.6855, 47.484, 60.9389);
     private final Pose point3 = mirror(60.1692, 94.8227, 90.6249);
-    private final Pose point4 = mirror(46.5804, 105, 134.495);
+    private final Pose point4 = mirror(46.5804, 100, 134.495);
     private final Pose point5 = mirror(16, 116, -170.274);
 
     private Pose mirror(double redX, double redY, double redHeadingDeg) {
