@@ -201,7 +201,7 @@ public class Limelight extends SubsystemIF {
                         measuredHeight, UP_CELL_TAG_HEIGHT_IN - measuredHeight, CAMERA_HEIGHT_IN));
         if (!Double.isNaN(measuredHeight)
                 && Math.abs(UP_CELL_TAG_HEIGHT_IN - measuredHeight - CAMERA_HEIGHT_IN) > CAMERA_MOVED_IN) {
-            telemetry.addLine("!!! LIMELIGHT MAY HAVE MOVED: run Limelight Calibration");
+            telemetry.addLine("!!! LIMELIGHT MAY HAVE MOVED: re-measure CAMERA_HEIGHT_IN and CAMERA_PITCH_DEG");
         }
         telemetry.addData("LL Distance (in)", getDistance(pose));
         telemetry.addData("LL Aim Error (deg)", getAimErrorDeg(pose));

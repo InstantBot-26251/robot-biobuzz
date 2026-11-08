@@ -88,46 +88,6 @@ public final class TargetMath {
         return 0.5 * (copy[count / 2 - 1] + copy[count / 2]);
     }
 
-    public static double forwardPerInchOfHeight(double tyDeg, double camPitchDeg) {
-        double up = Math.tan(Math.toRadians(tyDeg));
-        double pitch = Math.toRadians(camPitchDeg);
-        double vertical = Math.sin(pitch) + up * Math.cos(pitch);
-        if (vertical < 1e-3) return Double.NaN;
-        return (Math.cos(pitch) - up * Math.sin(pitch)) / vertical;
-    }
-
-    public static double[] solveCamera(List<double[]> sightings, double tagHeightIn) {
-        double bestPitch = Double.NaN, bestError = Double.POSITIVE_INFINITY, bestHeight = Double.NaN;
-        for (int pass = 0; pass < 3; pass++) {
-            double from = pass == 0 ? 5 : bestPitch - (pass == 1 ? 0.5 : 0.01);
-            double to = pass == 0 ? 70 : bestPitch + (pass == 1 ? 0.5 : 0.01);
-            double step = pass == 0 ? 0.05 : pass == 1 ? 0.001 : 0.00002;
-            for (double pitch = from; pitch <= to; pitch += step) {
-                double num = 0, den = 0;
-                for (double[] s : sightings) {
-                    double c = forwardPerInchOfHeight(s[0], pitch);
-                    if (Double.isNaN(c)) { den = 0; break; }
-                    num += c * s[1];
-                    den += c * c;
-                }
-                if (den < 1e-12) continue;
-                double above = num / den;
-                double error = 0;
-                for (double[] s : sightings) {
-                    double miss = above * forwardPerInchOfHeight(s[0], pitch) - s[1];
-                    error += miss * miss;
-                }
-                if (error < bestError) {
-                    bestError = error;
-                    bestPitch = pitch;
-                    bestHeight = tagHeightIn - above;
-                }
-            }
-            if (Double.isNaN(bestPitch)) break;
-        }
-        return new double[]{bestHeight, bestPitch, Math.sqrt(bestError / Math.max(1, sightings.size()))};
-    }
-
     public static double normalizeAngle(double radians) {
         double a = radians % (2 * Math.PI);
         if (a > Math.PI) a -= 2 * Math.PI;
