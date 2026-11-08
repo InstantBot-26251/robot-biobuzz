@@ -26,6 +26,7 @@ import static org.firstinspires.ftc.teamcode.vision.VisionConstants.*;
 import android.util.Log;
 
 public class Limelight extends SubsystemIF {
+    private static final double CAMERA_MOVED_IN = 1.5;
     private final Telemetry telemetry;
     private final Chassis chassis;
     private final HiveTracker tracker = new HiveTracker();
@@ -198,6 +199,10 @@ public class Limelight extends SubsystemIF {
                 ? "measuring (needs 2+ tags of a cell in view)"
                 : String.format(java.util.Locale.US, "%.1f  -> real camera height ~%.1f in (CAMERA_HEIGHT_IN is %.1f)",
                         measuredHeight, UP_CELL_TAG_HEIGHT_IN - measuredHeight, CAMERA_HEIGHT_IN));
+        if (!Double.isNaN(measuredHeight)
+                && Math.abs(UP_CELL_TAG_HEIGHT_IN - measuredHeight - CAMERA_HEIGHT_IN) > CAMERA_MOVED_IN) {
+            telemetry.addLine("!!! LIMELIGHT MAY HAVE MOVED: run Limelight Calibration");
+        }
         telemetry.addData("LL Distance (in)", getDistance(pose));
         telemetry.addData("LL Aim Error (deg)", getAimErrorDeg(pose));
         telemetry.addData("LL Latency (ms)", lastLatencyMs);

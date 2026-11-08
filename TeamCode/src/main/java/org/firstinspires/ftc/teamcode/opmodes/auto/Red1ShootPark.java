@@ -11,7 +11,7 @@ import com.seattlesolvers.solverslib.command.Commands;
 import org.firstinspires.ftc.teamcode.opmodes.Alliance;
 import org.firstinspires.ftc.teamcode.util.AutoFactory;
 
-@Autonomous(name = "Red Alliance Shoot Park-C1")
+@Autonomous(name = "Red Alliance SP-C1")
 public class Red1ShootPark extends AutoFactory {
 
     @Override

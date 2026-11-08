@@ -129,7 +129,8 @@ public class RobotContainer extends Robot {
                 () -> gamepad1.getLeftY() * driveScale(),
                 () -> -gamepad1.getLeftX() * driveScale(),
                 () -> -gamepad1.getRightX() * turnScale(),
-                this::aimHeld));
+                this::aimHeld,
+                this::holdHeld));
 
         shooter.setFeedPermission(() -> !aimHeld() || aimLocked());
 
@@ -162,6 +163,10 @@ public class RobotContainer extends Robot {
 
     private boolean aimHeld() {
         return gamepad1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3;
+    }
+
+    private boolean holdHeld() {
+        return gamepad1.getButton(GamepadKeys.Button.RIGHT_BUMPER);
     }
 
     private boolean slowHeld() {
@@ -323,6 +328,7 @@ public class RobotContainer extends Robot {
         if (teleop) {
             telemetry.addData("Aim Locked", aimLocked());
             telemetry.addData("Slow Mode", slowHeld());
+            telemetry.addData("Holding Position", holdHeld());
             telemetry.addData("Ready To Shoot", readyToShoot());
         }
         telemetry.addData("Loop Time", timer.milliseconds());

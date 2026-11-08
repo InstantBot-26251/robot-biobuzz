@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.FunctionalCommand;
 import org.firstinspires.ftc.teamcode.vision.Limelight;
+import org.firstinspires.ftc.teamcode.vision.TargetMath;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import static org.firstinspires.ftc.teamcode.chassis.DriveConstants.*;
@@ -13,9 +14,28 @@ import static org.firstinspires.ftc.teamcode.chassis.DriveConstants.*;
 public class ChassisCommands {
     public static Command createTeleopDriveCommand(Chassis chassis, Limelight limelight,
                                                    DoubleSupplier forward, DoubleSupplier left, DoubleSupplier turn,
-                                                   BooleanSupplier aim) {
+                                                   BooleanSupplier aim, BooleanSupplier hold) {
+        double[] held = new double[3];
+        boolean[] holding = {false};
         return chassis.runEnd(
                 () -> {
+                    if (hold.getAsBoolean()) {
+                        Pose pose = chassis.getPose();
+                        double heading = aim.getAsBoolean() && limelight.hasTarget()
+                                ? limelight.getAimFieldHeading(pose)
+                                : holding[0] ? held[2] : pose.heading();
+                        if (!holding[0]) {
+                            held[0] = pose.x();
+                            held[1] = pose.y();
+                        }
+                        if (!holding[0] || Math.abs(TargetMath.normalizeAngle(heading - held[2])) > Math.toRadians(0.5)) {
+                            held[2] = heading;
+                            chassis.holdPose(new Pose(held[0], held[1], heading));
+                        }
+                        holding[0] = true;
+                        return;
+                    }
+                    holding[0] = false;
                     if (aim.getAsBoolean() && limelight.hasTarget()) {
                         chassis.setDrivePowersFacing(forward.getAsDouble(), left.getAsDouble(),
                                 limelight.getAimFieldHeading(chassis.getPose()));
@@ -23,7 +43,10 @@ public class ChassisCommands {
                         chassis.setDrivePowers(forward.getAsDouble(), left.getAsDouble(), turn.getAsDouble());
                     }
                 },
-                chassis::stopFollower
+                () -> {
+                    holding[0] = false;
+                    chassis.stopFollower();
+                }
         );
     }
 

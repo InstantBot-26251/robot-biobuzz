@@ -51,6 +51,8 @@ public class HiveTracker {
     private static final int LOW_CELL_FRAMES = 8;
     private static final int LOW_CELL_VOTE_MAX = 16;
     private int lowCellVotes = 0;
+    private static final double MISFIT_SEPARATION_IN = 10;
+    private static final double OUTLIER_IN = 10;
 
     private boolean mapConfirmed = false;
     private boolean mapRejected = false;
@@ -255,10 +257,16 @@ public class HiveTracker {
             double learned = measuredUpHeightAboveCamera();
             if (Double.isNaN(learned)) learned = SIMPLE_TAG_HEIGHT_IN - CAMERA_HEIGHT_IN;
             double lowBelow = learned - 0.7 * (UP_CELL_TAG_HEIGHT_IN - DOWN_CELL_TAG_HEIGHT_IN);
-            if (count[0] > 0 && count[1] > 0) {
-                double[] elevation = new double[2];
-                for (Sighting s : ours) elevation[s.cell] += s.elevation / count[s.cell];
-                cell = elevation[0] >= elevation[1] ? 0 : 1;
+            double bestFit = count[0] > 0 && count[1] > 0
+                    ? Math.min(separationError(ours, 0), separationError(ours, 1)) : 0;
+            int fewer = count[0] < count[1] ? 0 : 1;
+            if (bestFit > MISFIT_SEPARATION_IN && count[fewer] == 1 && count[1 - fewer] >= 2) {
+                int keep = 1 - fewer;
+                ours.removeIf(s -> s.cell != keep);
+                count[fewer] = 0;
+                cell = keep;
+            } else if (count[0] > 0 && count[1] > 0) {
+                cell = medianElevation(ours, 0) >= medianElevation(ours, 1) ? 0 : 1;
             } else {
                 cell = count[0] > 0 ? 0 : 1;
             }
@@ -350,6 +358,18 @@ public class HiveTracker {
             return;
         }
 
+        if (points.size() >= 3) {
+            double[] xs = new double[points.size()], ys = new double[points.size()];
+            for (int i = 0; i < points.size(); i++) {
+                xs[i] = points.get(i)[0];
+                ys[i] = points.get(i)[1];
+            }
+            double mx = TargetMath.median(xs, xs.length), my = TargetMath.median(ys, ys.length);
+            List<double[]> kept = new ArrayList<>();
+            for (double[] p : points) if (Math.hypot(p[0] - mx, p[1] - my) <= OUTLIER_IN) kept.add(p);
+            if (kept.size() >= 2) points = kept;
+        }
+
         boolean axisKnown = CELL_AXIS[axisIndex(cell)] != null;
         if (points.size() == 1 && !axisKnown && (nowMs - lastSeenMs < TARGET_MEMORY_MS || mapUsable())) {
             lastNote = cellName(cell) + label + " (1 tag, kept previous fix)";
@@ -385,29 +405,34 @@ public class HiveTracker {
         return alliance.ordinal() * 2 + cell;
     }
 
-    private int pickUpCellByGeometry(List<Sighting> ours, double[] elevationSum, int[] seen) {
+    private static double medianElevation(List<Sighting> ours, int cell) {
+        double[] values = new double[ours.size()];
+        int n = 0;
+        for (Sighting s : ours) if (s.cell == cell) values[n++] = s.elevation;
+        return TargetMath.median(values, n);
+    }
+
+    private double separationError(List<Sighting> ours, int hypothesis) {
         double expected = UP_CELL_TAG_OFFSET_IN + DOWN_CELL_TAG_OFFSET_IN;
-        double[] score = new double[2];
-        for (int hypothesis = 0; hypothesis < 2; hypothesis++) {
-            double[][] mean = new double[2][2];
-            int[] count = new int[2];
-            for (Sighting s : ours) {
-                double height = s.cell == hypothesis ? UP_CELL_TAG_HEIGHT_IN : DOWN_CELL_TAG_HEIGHT_IN;
-                double[] p = TargetMath.targetInRobotFrame(s.tx, s.ty, height, CAMERA_HEIGHT_IN,
-                        CAMERA_PITCH_DEG, CAMERA_YAW_DEG, CAMERA_FORWARD_IN, CAMERA_LEFT_IN);
-                if (p == null) continue;
-                mean[s.cell][0] += p[0];
-                mean[s.cell][1] += p[1];
-                count[s.cell]++;
-            }
-            if (count[0] == 0 || count[1] == 0) {
-                score[hypothesis] = Double.MAX_VALUE;
-                continue;
-            }
-            double sep = Math.hypot(mean[0][0] / count[0] - mean[1][0] / count[1],
-                    mean[0][1] / count[0] - mean[1][1] / count[1]);
-            score[hypothesis] = Math.abs(sep - expected);
+        double[][] mean = new double[2][2];
+        int[] count = new int[2];
+        for (Sighting s : ours) {
+            double height = s.cell == hypothesis ? UP_CELL_TAG_HEIGHT_IN : DOWN_CELL_TAG_HEIGHT_IN;
+            double[] p = TargetMath.targetInRobotFrame(s.tx, s.ty, height, CAMERA_HEIGHT_IN,
+                    CAMERA_PITCH_DEG, CAMERA_YAW_DEG, CAMERA_FORWARD_IN, CAMERA_LEFT_IN);
+            if (p == null) continue;
+            mean[s.cell][0] += p[0];
+            mean[s.cell][1] += p[1];
+            count[s.cell]++;
         }
+        if (count[0] == 0 || count[1] == 0) return Double.MAX_VALUE;
+        double sep = Math.hypot(mean[0][0] / count[0] - mean[1][0] / count[1],
+                mean[0][1] / count[0] - mean[1][1] / count[1]);
+        return Math.abs(sep - expected);
+    }
+
+    private int pickUpCellByGeometry(List<Sighting> ours, double[] elevationSum, int[] seen) {
+        double[] score = {separationError(ours, 0), separationError(ours, 1)};
         if (score[0] == Double.MAX_VALUE && score[1] == Double.MAX_VALUE) {
             return elevationSum[0] / seen[0] >= elevationSum[1] / seen[1] ? 0 : 1;
         }
