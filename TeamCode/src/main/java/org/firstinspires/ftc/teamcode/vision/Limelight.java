@@ -22,6 +22,8 @@ import java.util.List;
 
 import static org.firstinspires.ftc.teamcode.vision.VisionConstants.*;
 
+import android.util.Log;
+
 public class Limelight extends SubsystemIF {
     private final Telemetry telemetry;
     private final Chassis chassis;
@@ -40,6 +42,7 @@ public class Limelight extends SubsystemIF {
     private int activePipeline = APRILTAG_PIPELINE;
     private boolean pipelineSearchDone = false;
     private final ElapsedTime pipelineTimer = new ElapsedTime();
+    private boolean lastConnectedState = false;
 
     public Limelight(Telemetry telemetry, HardwareMap hardwareMap, Chassis chassis) {
         this.telemetry = telemetry;
@@ -72,6 +75,7 @@ public class Limelight extends SubsystemIF {
         limelight.pipelineSwitch(activePipeline);
         pipelineTimer.reset();
         limelight.start();
+        lastConnectedState = limelight.isConnected();
     }
 
     private void checkPipeline(LLResult result) {
@@ -188,6 +192,12 @@ public class Limelight extends SubsystemIF {
                 : tracker.isMapRejected() ? "DISAGREES with camera -> disabled"
                   : tracker.isMapConfirmed() ? String.format("confirmed (%.1f in off)", tracker.getLastMapErrorIn())
                     : tracker.mapUsable() ? "in use, not yet confirmed" : "not used (pose not from auto)");
+
+        if (!limelight.isRunning() && lastConnectedState) {
+            Log.w("===== LIMELIGHT =====", "Lost connection");
+        }
+
+        lastConnectedState = limelight.isRunning();
     }
 
     private void process(LLResult result) {

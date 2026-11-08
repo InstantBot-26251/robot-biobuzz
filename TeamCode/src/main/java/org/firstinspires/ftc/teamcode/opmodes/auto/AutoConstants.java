@@ -19,6 +19,6 @@ public class AutoConstants {
     public static long AIM_SETTLE_MS = 300;
     public static double AIM_SETTLE_MAX_DEG_PER_SEC = 50;
     public static long TARGET_WAIT_TIME = 500;
-    public static long TARGET_SEARCH_TIME = 8000;
+    public static long TARGET_SEARCH_TIME = 5000;
     public static double TARGET_SEARCH_TURN_POWER = -0.5;
 }

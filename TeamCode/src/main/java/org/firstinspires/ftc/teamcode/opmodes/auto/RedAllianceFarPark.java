@@ -35,8 +35,8 @@ public class RedAllianceFarPark extends AutoFactory {
 
     private final Pose point2 = poseFactory.of(60.6855, 47.484, 60.9389);
     private final Pose point3 = poseFactory.of(60.1692, 94.8227, 90.6249);
-    private final Pose point4 = poseFactory.of(46.5804, 105, 134.495);
-    private final Pose point5 = poseFactory.of(12, 116, -170.274);
+    private final Pose point4 = poseFactory.of(46.5804, 100, 134.495);
+    private final Pose point5 = poseFactory.of(16, 116, -170.274);
 
     public Path driveForward() {
         return Paths.line(start, point1).constant(start);
