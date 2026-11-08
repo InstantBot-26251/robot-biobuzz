@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.opmodes.Alliance;
+import org.firstinspires.ftc.teamcode.shooter.ShooterConstants;
 import org.firstinspires.ftc.teamcode.util.PanelsDrawing;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 
@@ -121,16 +122,28 @@ public class Limelight extends SubsystemIF {
         return isLive() ? tracker.getLastUpTags() : 0;
     }
 
-    public double getDistance(Pose robot) {
+    public double[] shotTarget() {
         double[] t = tracker.target(clock.milliseconds());
+        if (t == null || !ShooterConstants.MOVING_SHOTS) return t;
+        double[] v = chassis.fieldVelocity();
+        if (Math.hypot(v[0], v[1]) < ShooterConstants.MOVING_SHOT_MIN_SPEED) return t;
+        return new double[]{t[0] - v[0] * ShooterConstants.SHOT_FLIGHT_TIME_S, t[1] - v[1] * ShooterConstants.SHOT_FLIGHT_TIME_S};
+    }
+
+    public double getDistance(Pose robot) {
+        double[] t = shotTarget();
         if (t == null) return Double.NaN;
         return Math.hypot(t[0] - robot.x(), t[1] - robot.y());
     }
 
     public double getAimFieldHeading(Pose robot) {
-        double[] t = tracker.target(clock.milliseconds());
+        double[] t = shotTarget();
         if (t == null) return robot.heading();
-        return Math.atan2(t[1] - robot.y(), t[0] - robot.x());
+        double bearing = Math.atan2(t[1] - robot.y(), t[0] - robot.x());
+        double distance = Math.hypot(t[0] - robot.x(), t[1] - robot.y());
+        double side = ShooterConstants.SHOOTER_LEFT_IN;
+        if (Math.abs(side) < distance) bearing -= Math.asin(side / distance);
+        return bearing;
     }
 
     public double getAimErrorDeg(Pose robot) {

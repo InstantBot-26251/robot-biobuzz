@@ -11,10 +11,14 @@ public class ShooterConstants {
 
     public static double SHOT_RPM_OFFSET = 0;
 
+    public static double SHOOTER_LEFT_IN = 0;
+
+    public static boolean MOVING_SHOTS = true;
+    public static double SHOT_FLIGHT_TIME_S = 0.6;
+    public static double MOVING_SHOT_MIN_SPEED = 3;
+
     public static double FIXED_RPM = 3000;
     public static double FIXED_RPM_STEP = 100;
-
-    public static long SPIN_UP_TIME_MS = 1500;
 
     public static boolean VOLTAGE_COMPENSATION = true;
     public static double LOW_VOLTAGE_THRESHOLD = 11.5;

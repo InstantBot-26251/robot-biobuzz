@@ -74,7 +74,7 @@ public class RedAllianceFarPark extends AutoFactory {
         return Commands.sequence(
                 robot.enableShooter(),
                 robot.followPath(driveForward()),
-                robot.aimAndShoot(AutoConstants.SHOOT_TIME),
+                robot.aimAndShoot(),
                 robot.followPath(park())
         );
     }

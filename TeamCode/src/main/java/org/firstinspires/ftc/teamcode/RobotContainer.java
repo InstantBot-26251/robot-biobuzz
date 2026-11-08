@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.depollinator.Depollinator;
 import org.firstinspires.ftc.teamcode.depollinator.DepollinatorCommands;
 import org.firstinspires.ftc.teamcode.intake.Intake;
 import org.firstinspires.ftc.teamcode.intake.IntakeCommands;
+import org.firstinspires.ftc.teamcode.opmodes.Alliance;
 import org.firstinspires.ftc.teamcode.opmodes.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
@@ -108,12 +109,11 @@ public class RobotContainer extends Robot {
             s.autonomousInit();
         }
 
-        // In auto, never fire off target or under speed: a held ball beats a missed one
         shooter.setForcedFeedAllowed(false);
         shooter.setFixedAutoRpm(() -> AutoConstants.AUTO_SHOT_RPM);
         shooter.setExtraRpm(() -> AutoConstants.AUTO_RPM_OFFSET
                 + (secondGroup ? AutoConstants.SECOND_GROUP_EXTRA_RPM : 0));
-        shooter.setFeedPermission(() -> !AutoConstants.AUTO_AIM || aimSettled());
+        shooter.setFeedPermission(this::aimSettled);
     }
 
     public void teleopInit() {
@@ -185,7 +185,6 @@ public class RobotContainer extends Robot {
         return aimLocked() && Math.abs(chassis.getAngularVelocity()) < Math.toRadians(AutoConstants.AIM_SETTLE_MAX_DEG_PER_SEC);
     }
 
-    // On target and not turning for a moment, so the target isn't still based on frames from the spin
     private boolean aimSettled() {
         return aimSteady() && aimSettledTimer.milliseconds() >= AutoConstants.AIM_SETTLE_MS;
     }
@@ -195,7 +194,6 @@ public class RobotContainer extends Robot {
                 && Math.abs(shooter.getTargetRpm() - shooter.getShooterRpm()) <= ShooterConstants.SHOOTER_VELOCITY_TOLERANCE;
     }
 
-    // Shooter has held its target speed for a while, so it's done swinging after the last shot
     private boolean shooterSteady() {
         return shooterOnSpeed() && shooterSteadyTimer.milliseconds() >= AutoConstants.GROUP2_STEADY_MS;
     }
@@ -240,69 +238,48 @@ public class RobotContainer extends Robot {
     }
 
     public Command aim() {
-        return ChassisCommands.createTeleopDriveCommand(chassis, limelight, () -> 0, () -> 0, () -> 0, () -> true);
+        return chassis.runEnd(
+                () -> chassis.setDrivePowersFacing(0, 0, autoAimHeading()),
+                chassis::stopFollower);
     }
 
-    public Command aimAndShoot(long shootTime) {
-        boolean useAim = AutoConstants.AUTO_AIM;
-        Command shooting = Commands.sequence(
-                Commands.race(
-                        Commands.waitUntil(() -> shooter.atTargetVelocity() && (!useAim || aimSettled())),
-                        Commands.waitMillis(ShooterConstants.SPIN_UP_TIME_MS)),
-                ShooterCommands.shoot(shooter),
-                Commands.waitMillis(shootTime),
-                ShooterCommands.disableShooter(shooter));
-        if (!useAim) {
-            return Commands.sequence(
-                    ShooterCommands.enableShooter(shooter),
-                    Commands.race(
-                            Commands.waitUntil(limelight::hasTarget),
-                            Commands.waitMillis(AutoConstants.TARGET_WAIT_TIME)),
-                    shooting);
-        }
-        // Feed, pause so the shooter recovers, then feed the rest
-        Command timedShooting = Commands.sequence(
-                Commands.runOnce(() -> secondGroup = false),
-                Commands.race(
-                        Commands.waitUntil(() -> shooter.atTargetVelocity() && aimSettled()),
-                        Commands.waitMillis(ShooterConstants.SPIN_UP_TIME_MS)),
+    private double autoAimHeading() {
+        Pose pose = chassis.getPose();
+        if (limelight.hasTarget()) return limelight.getAimFieldHeading(pose);
+        double hiveY = Alliance.getCurrent() == Alliance.RED ? VisionConstants.RED_HIVE_Y_IN : VisionConstants.BLUE_HIVE_Y_IN;
+        return Math.atan2(hiveY - pose.y(), VisionConstants.HIVE_CENTER_X_IN - pose.x());
+    }
+
+    private boolean readyToFire() {
+        return limelight.isLive() && aimSettled();
+    }
+
+    public Command aimAndShoot() {
+        Command volley = Commands.sequence(
                 Commands.runOnce(() -> shooter.setFeedOverride(true)),
                 Commands.waitMillis(AutoConstants.FIRST_FEED_TIME_MS),
-                // Group 2 gets its own speed; switching now lets the shooter reach it during the pause
                 Commands.runOnce(() -> {
                     shooter.setFeedOverride(false);
                     secondGroup = true;
                 }),
                 Commands.waitMillis(AutoConstants.FEED_PAUSE_TIME_MS),
-                // Don't start group 2 until the speed has settled after group 1
                 Commands.race(
                         Commands.waitUntil(this::shooterSteady),
                         Commands.waitMillis(AutoConstants.GROUP2_MAX_WAIT_MS)),
                 Commands.runOnce(() -> shooter.setFeedOverride(true)),
                 Commands.waitMillis(AutoConstants.SECOND_FEED_TIME_MS),
                 Commands.runOnce(() -> shooter.setFeedOverride(false)),
-                // Keep the wheels at speed so the last balls still in the feed get shot
-                Commands.waitMillis(AutoConstants.SPIN_AFTER_FEED_MS),
+                Commands.waitMillis(AutoConstants.SPIN_AFTER_FEED_MS));
+        Command shooting = Commands.sequence(
+                Commands.runOnce(() -> secondGroup = false),
+                Commands.race(
+                        Commands.waitUntil(() -> readyToFire() && shooter.atTargetVelocity()),
+                        Commands.waitMillis(AutoConstants.SHOT_READY_TIMEOUT_MS)),
+                new ConditionalCommand(volley, Commands.none(), this::readyToFire),
                 ShooterCommands.disableShooter(shooter));
-        // Spin until a tag is seen. If the time runs out, don't fire in a random direction
         return Commands.sequence(
                 ShooterCommands.enableShooter(shooter),
-                Commands.race(
-                        Commands.waitUntil(limelight::isLive),
-                        Commands.waitMillis(AutoConstants.TARGET_SEARCH_TIME),
-                        spin(AutoConstants.TARGET_SEARCH_TURN_POWER)),
-                new ConditionalCommand(
-                        Commands.race(aim(), timedShooting),
-                        ShooterCommands.disableShooter(shooter),
-                        limelight::isLive));
-    }
-
-    private Command spin(double turnPower) {
-        return ChassisCommands.createTeleopDriveCommand(chassis, limelight, () -> 0, () -> 0, () -> turnPower, () -> false);
-    }
-
-    public Command shootFor(long shootTime) {
-        return aimAndShoot(shootTime);
+                Commands.race(aim(), shooting));
     }
 
     public Chassis getChassis() {

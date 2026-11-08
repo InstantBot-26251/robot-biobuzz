@@ -152,6 +152,20 @@ public class Chassis extends SubsystemIF {
         return follower.velocity().omega;
     }
 
+    public double[] fieldVelocity() {
+        if (historyCount < 2) return new double[]{0, 0};
+        int newest = (historyHead - 1 + POSE_HISTORY_SIZE) % POSE_HISTORY_SIZE;
+        for (int i = 1; i < historyCount; i++) {
+            int idx = (historyHead - 1 - i + POSE_HISTORY_SIZE) % POSE_HISTORY_SIZE;
+            double dt = (historyTimes[newest] - historyTimes[idx]) / 1e9;
+            if (dt >= 0.08) {
+                return new double[]{(historyPoses[newest].x() - historyPoses[idx].x()) / dt,
+                        (historyPoses[newest].y() - historyPoses[idx].y()) / dt};
+            }
+        }
+        return new double[]{0, 0};
+    }
+
     public Pose poseAt(long nanoTime) {
         if (historyCount == 0) return getPose();
         Pose best = null;
