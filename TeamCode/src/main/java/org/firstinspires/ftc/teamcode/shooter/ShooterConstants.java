@@ -21,7 +21,7 @@ public class ShooterConstants {
     public static double FIXED_RPM_STEP = 100;
 
     public static boolean VOLTAGE_COMPENSATION = true;
-    public static double LOW_VOLTAGE_THRESHOLD = 11.5;
+    public static double LOW_VOLTAGE_THRESHOLD = 11;
     public static double LOW_VOLTAGE_RPM_PER_VOLT = 100;
 
     public static double MAX_EXTRAPOLATE_IN = 8;

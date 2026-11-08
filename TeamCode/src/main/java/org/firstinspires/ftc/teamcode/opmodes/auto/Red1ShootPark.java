@@ -15,34 +15,40 @@ import org.firstinspires.ftc.teamcode.util.AutoFactory;
 public class Red1ShootPark extends AutoFactory {
 
     @Override
-    protected Alliance getAlliance(){return Alliance.RED;}
+    protected Alliance getAlliance() {
+        return Alliance.RED;
+    }
 
     @Override
     protected Pose setStartPose() {
         return start;
     }
 
-    private static final double CORNER_RADIUS_IN = 20;
+    private static final double CORNER_RADIUS_IN = 8;
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = poseFactory.of(56, 6.3162, 270);
-    private final Pose path1 = poseFactory.of(56, 31.443, 270);
-    private final Pose point2 = poseFactory.of(59, 45.5261, 90.4146);
-    private final Pose point2Control1 = poseFactory.of(54.9388, 36.2705, 0);
-    private final Pose point2Control2 = poseFactory.of(59.0584, 37.4536, 0);
-    private final Pose point3 = poseFactory.of(59, 121.8165, 90);
-    private final Pose point4 = poseFactory.of(12.531, 121.82, 179.9957);
+    private final Pose start = poseFactory.of(56, 8.8144, 90);
+    private final Pose shootSpot = poseFactory.of(56, 26.6345, 90);
+    private final Pose point2 = poseFactory.of(33, 26.63, 90);
+    private final Pose point3 = poseFactory.of(33, 115, 90);
+    private final Pose point4 = poseFactory.of(10, 115, 180);
 
+    // Drive straight forward to the shooting spot, shooter still facing the hive
     public Path path1() {
-        return Paths.line(start, path1).reverseTangent();
+        return Paths.line(start, shootSpot).constant(start);
     }
 
+    // Slide left to point2 while facing straight up the field
+    public Path path2() {
+        return Paths.line(shootSpot, point2).constant(point2);
+    }
+
+    // Up the field, then a rounded left turn into the park spot
     public Path park() {
         Pose beforeCorner = toward(point3, point2, CORNER_RADIUS_IN);
         Pose afterCorner = toward(point3, point4, CORNER_RADIUS_IN);
         return Paths.path(
-                Paths.curve(path1, point2Control1, point2Control2, point2),
                 Paths.line(point2, beforeCorner),
                 Paths.curve(beforeCorner, point3, afterCorner),
                 Paths.line(afterCorner, point4)
@@ -62,6 +68,7 @@ public class Red1ShootPark extends AutoFactory {
                 robot.enableShooter(),
                 robot.followPath(path1()),
                 robot.aimAndShoot(),
+                robot.followPath(path2()),
                 robot.followPath(park())
         );
     }
