@@ -239,6 +239,15 @@ public class RobotContainer extends Robot {
         return ChassisCommands.createFollowPathCommand(chassis, path, holdEnd);
     }
 
+    public Command turnTo(double headingDeg) {
+        return Commands.sequence(
+                Commands.runOnce(() -> {
+                    Pose pose = chassis.getPose();
+                    chassis.holdPose(new Pose(pose.x(), pose.y(), Math.toRadians(headingDeg)));
+                }, chassis),
+                waitForTurn(headingDeg));
+    }
+
     public Command waitForTurn(double headingDeg) {
         double target = Math.toRadians(headingDeg);
         return Commands.race(

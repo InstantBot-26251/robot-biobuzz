@@ -4,10 +4,10 @@ import com.bylazar.configurables.annotations.Configurable;
 
 @Configurable
 public class VisionConstants {
-    public static double CAMERA_HEIGHT_IN = 10.0; // floor to center of camera lens
-    public static double CAMERA_PITCH_DEG = 31.0; // camera tilt up from flat
-    public static double CAMERA_FORWARD_IN = 0.0; // lens in front of robot center (negative if behind)
-    public static double CAMERA_LEFT_IN = 0.0; // lens left of robot center (negative if right)
+    public static double CAMERA_HEIGHT_IN = 10.0;
+    public static double CAMERA_PITCH_DEG = 31.0;
+    public static double CAMERA_FORWARD_IN = 0.0;
+    public static double CAMERA_LEFT_IN = 0.0;
 
     public static String LIMELIGHT_NAME = "limelight";
     public static int APRILTAG_PIPELINE = 0;

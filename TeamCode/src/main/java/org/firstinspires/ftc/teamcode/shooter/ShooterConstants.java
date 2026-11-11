@@ -11,10 +11,10 @@ public class ShooterConstants {
 
     public static double SHOT_RPM_OFFSET = 0;
 
-    public static double SHOOTER_LEFT_IN = 0; // ball exit left of robot center (negative if right)
+    public static double SHOOTER_LEFT_IN = 0;
 
     public static boolean MOVING_SHOTS = true;
-    public static double SHOT_FLIGHT_TIME_S = 0.6; // only for shooting while moving
+    public static double SHOT_FLIGHT_TIME_S = 0.6;
     public static double MOVING_SHOT_MIN_SPEED = 3;
 
     public static double FIXED_RPM = 3000;

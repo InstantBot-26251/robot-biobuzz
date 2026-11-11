@@ -29,7 +29,6 @@ public class Red2DualShoot extends AutoFactory {
     private final Pose point2 = poseFactory.of(56, 9.1657, 180);
     private final Pose point3 = poseFactory.of(9, 8.97, -179.7615);
     private final Pose point4 = poseFactory.of(56, 24.45, 180);
-    private final Pose point5Start = poseFactory.of(56, 24.45, 0);
     private final Pose point5 = poseFactory.of(56, 24.4468, 270);
     private final Pose point6 = poseFactory.of(24.45, 24.5795, 179.759);
     private final Pose point7 = poseFactory.of(24.45, 95.553, 90);
@@ -51,10 +50,6 @@ public class Red2DualShoot extends AutoFactory {
         return Paths.line(point3, point4).constant(point4);
     }
 
-    public Path path5() {
-        return Paths.line(point5Start, point5).linear(point5Start, point5);
-    }
-
     public Path path6() {
         return Paths.line(point5, point6).tangent();
     }
@@ -74,8 +69,7 @@ public class Red2DualShoot extends AutoFactory {
                 robot.followPath(path2()),
                 robot.followPath(path3()),
                 robot.followPath(path4()),
-                robot.followPath(path5()),
-                robot.waitForTurn(270),
+                robot.turnTo(270),
                 robot.followPath(path6()),
                 robot.followPath(path7()),
                 robot.followPath(path8())
