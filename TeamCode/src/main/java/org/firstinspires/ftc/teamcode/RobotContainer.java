@@ -257,6 +257,14 @@ public class RobotContainer extends Robot {
                 Commands.waitMillis(AutoConstants.TURN_WAIT_MS));
     }
 
+    public Command startIntake() {
+        return IntakeCommands.intake(intake);
+    }
+
+    public Command stopIntake() {
+        return IntakeCommands.stopIntake(intake);
+    }
+
     public Command enableShooter() {
         return ShooterCommands.enableShooter(shooter);
     }

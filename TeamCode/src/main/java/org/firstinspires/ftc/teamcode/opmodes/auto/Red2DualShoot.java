@@ -65,11 +65,16 @@ public class Red2DualShoot extends AutoFactory {
     @Override
     protected Command createAutoSequence() {
         return Commands.sequence(
+                robot.enableShooter(),
                 robot.followPath(path1()),
+                robot.aimAndShoot(),
                 robot.followPath(path2()),
+                robot.startIntake(),
                 robot.followPath(path3()),
                 robot.followPath(path4()),
+                robot.stopIntake(),
                 robot.turnTo(270),
+                robot.aimAndShoot(),
                 robot.followPath(path6()),
                 robot.followPath(path7()),
                 robot.followPath(path8())
