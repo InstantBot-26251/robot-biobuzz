@@ -34,17 +34,14 @@ public class Red1ShootPark extends AutoFactory {
     private final Pose point3 = poseFactory.of(33, 115, 90);
     private final Pose point4 = poseFactory.of(10, 115, 180);
 
-    // Drive straight forward to the shooting spot, shooter still facing the hive
     public Path path1() {
         return Paths.line(start, shootSpot).constant(start);
     }
 
-    // Slide left to point2 while facing straight up the field
     public Path path2() {
         return Paths.line(shootSpot, point2).constant(point2);
     }
 
-    // Up the field, then a rounded left turn into the park spot
     public Path park() {
         Pose beforeCorner = toward(point3, point2, CORNER_RADIUS_IN);
         Pose afterCorner = toward(point3, point4, CORNER_RADIUS_IN);

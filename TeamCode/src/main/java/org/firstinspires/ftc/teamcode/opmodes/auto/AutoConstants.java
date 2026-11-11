@@ -8,6 +8,8 @@ public class AutoConstants {
     public static double AUTO_RPM_OFFSET = 50;
     public static double SECOND_GROUP_EXTRA_RPM = -10;
 
+    public static long TURN_WAIT_MS = 1000;
+    public static long TARGET_LOOK_MS = 1000;
     public static long SHOT_READY_TIMEOUT_MS = 3000;
     public static long AIM_SETTLE_MS = 300;
     public static double AIM_SETTLE_MAX_DEG_PER_SEC = 50;

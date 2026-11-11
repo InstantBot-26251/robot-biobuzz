@@ -50,6 +50,37 @@ public class ChassisCommands {
         );
     }
 
+    public static Command createSearchCommand(Chassis chassis, Limelight limelight) {
+        ElapsedTime timer = new ElapsedTime();
+        double[] state = new double[5];
+        return new FunctionalCommand(
+                () -> {
+                    timer.reset();
+                    Pose pose = chassis.getPose();
+                    state[0] = pose.x();
+                    state[1] = pose.y();
+                    state[2] = pose.heading();
+                    state[3] = 0;
+                    state[4] = pose.heading() + Math.toRadians(SEARCH_STEP_DEG);
+                    chassis.holdPose(new Pose(state[0], state[1], state[4]));
+                },
+                () -> {
+                    double heading = chassis.getPose().heading();
+                    state[3] += Math.abs(TargetMath.normalizeAngle(heading - state[2]));
+                    state[2] = heading;
+                    if (Math.abs(TargetMath.normalizeAngle(state[4] - heading)) < Math.toRadians(SEARCH_STEP_DEG / 2)) {
+                        state[4] += Math.toRadians(SEARCH_STEP_DEG);
+                        chassis.holdPose(new Pose(state[0], state[1], state[4]));
+                    }
+                },
+                interrupted -> {},
+                () -> limelight.isLive()
+                        || state[3] >= 2 * Math.PI
+                        || timer.milliseconds() > SEARCH_TIMEOUT_MS,
+                chassis
+        );
+    }
+
     public static Command createFollowPathCommand(Chassis chassis, Path path) {
         return createFollowPathCommand(chassis, path, true);
     }

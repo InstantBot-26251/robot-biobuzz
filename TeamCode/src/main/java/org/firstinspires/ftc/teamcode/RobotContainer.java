@@ -33,6 +33,7 @@ import org.firstinspires.ftc.teamcode.shooter.ShooterConstants;
 import org.firstinspires.ftc.teamcode.util.PanelsDrawing;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 import org.firstinspires.ftc.teamcode.vision.Limelight;
+import org.firstinspires.ftc.teamcode.vision.TargetMath;
 import org.firstinspires.ftc.teamcode.vision.VisionConstants;
 import java.util.ArrayList;
 import java.util.List;
@@ -238,6 +239,15 @@ public class RobotContainer extends Robot {
         return ChassisCommands.createFollowPathCommand(chassis, path, holdEnd);
     }
 
+    public Command waitForTurn(double headingDeg) {
+        double target = Math.toRadians(headingDeg);
+        return Commands.race(
+                Commands.waitUntil(() -> Math.abs(TargetMath.normalizeAngle(chassis.getPose().heading() - target))
+                        < Math.toRadians(DriveConstants.AIM_TOLERANCE_DEG)
+                        && Math.abs(chassis.getAngularVelocity()) < Math.toRadians(30)),
+                Commands.waitMillis(AutoConstants.TURN_WAIT_MS));
+    }
+
     public Command enableShooter() {
         return ShooterCommands.enableShooter(shooter);
     }
@@ -284,7 +294,18 @@ public class RobotContainer extends Robot {
                 ShooterCommands.disableShooter(shooter));
         return Commands.sequence(
                 ShooterCommands.enableShooter(shooter),
-                Commands.race(aim(), shooting));
+                Commands.race(
+                        aim(),
+                        Commands.waitUntil(limelight::isLive),
+                        Commands.waitMillis(AutoConstants.TARGET_LOOK_MS)),
+                new ConditionalCommand(
+                        Commands.none(),
+                        ChassisCommands.createSearchCommand(chassis, limelight),
+                        limelight::isLive),
+                new ConditionalCommand(
+                        Commands.race(aim(), shooting),
+                        ShooterCommands.disableShooter(shooter),
+                        limelight::isLive));
     }
 
     public Chassis getChassis() {
