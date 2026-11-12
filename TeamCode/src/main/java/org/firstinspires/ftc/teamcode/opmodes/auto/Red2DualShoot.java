@@ -10,6 +10,7 @@ import com.seattlesolvers.solverslib.command.Commands;
 
 import org.firstinspires.ftc.teamcode.opmodes.Alliance;
 import org.firstinspires.ftc.teamcode.util.AutoFactory;
+import org.firstinspires.ftc.teamcode.vision.VisionConstants;
 
 @Autonomous(name = "Red Alliance SGSP-C1")
 public class Red2DualShoot extends AutoFactory {
@@ -33,6 +34,9 @@ public class Red2DualShoot extends AutoFactory {
     private final Pose point6 = poseFactory.of(24.45, 24.5795, 179.759);
     private final Pose point7 = poseFactory.of(24.45, 95.553, 90);
     private final Pose point8 = poseFactory.of(13.0815, 95.6501, 179.5104);
+
+    private static final double HIVE_HEADING_DEG = Math.toDegrees(Math.atan2(
+            VisionConstants.RED_HIVE_Y_IN - 24.45, VisionConstants.HIVE_CENTER_X_IN - 56));
 
     public Path path1() {
         return Paths.line(start, path1).reverseTangent();
@@ -67,13 +71,14 @@ public class Red2DualShoot extends AutoFactory {
         return Commands.sequence(
                 robot.enableShooter(),
                 robot.followPath(path1()),
+                robot.turnTo(HIVE_HEADING_DEG),
                 robot.aimAndShoot(),
                 robot.followPath(path2()),
                 robot.startIntake(),
                 robot.followPath(path3()),
                 robot.followPath(path4()),
                 robot.stopIntake(),
-                robot.turnTo(270),
+                robot.turnTo(HIVE_HEADING_DEG),
                 robot.aimAndShoot(),
                 robot.followPath(path6()),
                 robot.followPath(path7()),

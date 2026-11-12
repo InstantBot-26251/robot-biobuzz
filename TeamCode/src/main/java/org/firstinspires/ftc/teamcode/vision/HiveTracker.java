@@ -373,6 +373,8 @@ public class HiveTracker {
         boolean axisKnown = CELL_AXIS[axisIndex(cell)] != null;
         if (points.size() == 1 && !axisKnown && (nowMs - lastSeenMs < TARGET_MEMORY_MS || mapUsable())) {
             lastNote = cellName(cell) + label + " (1 tag, kept previous fix)";
+            // The hive is still in view, so the kept fix stays live (auto waits for a live target)
+            if (sampleCount > 0) lastSeenMs = nowMs;
             return;
         }
         double[] center = clusterCenter(points, cell);

@@ -62,6 +62,7 @@ public class RobotContainer extends Robot {
     private boolean wasAimLocked = false;
     private final ElapsedTime aimSettledTimer = new ElapsedTime();
     private boolean secondGroup = false;
+    private String autoStepText = "-";
     private final ElapsedTime shooterSteadyTimer = new ElapsedTime();
 
     public RobotContainer(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
@@ -311,18 +312,27 @@ public class RobotContainer extends Robot {
                 ShooterCommands.disableShooter(shooter));
         return Commands.sequence(
                 ShooterCommands.enableShooter(shooter),
+                autoStep("looking for tags"),
                 Commands.race(
                         aim(),
                         Commands.waitUntil(limelight::isLive),
                         Commands.waitMillis(AutoConstants.TARGET_LOOK_MS)),
                 new ConditionalCommand(
                         Commands.none(),
-                        ChassisCommands.createSearchCommand(chassis, limelight),
+                        Commands.sequence(autoStep("searching (spinning)"),
+                                ChassisCommands.createSearchCommand(chassis, limelight)),
                         limelight::isLive),
+                // Aim at the hive if it was seen recently; shots still wait until the tags are in view
                 new ConditionalCommand(
-                        Commands.race(aim(), shooting),
-                        ShooterCommands.disableShooter(shooter),
-                        limelight::isLive));
+                        Commands.sequence(autoStep("aiming + shooting"), Commands.race(aim(), shooting)),
+                        Commands.sequence(autoStep("SKIPPED SHOT: never saw a tag"),
+                                ShooterCommands.disableShooter(shooter)),
+                        limelight::hasTarget),
+                autoStep("done shooting"));
+    }
+
+    private Command autoStep(String step) {
+        return Commands.runOnce(() -> autoStepText = step);
     }
 
     public Chassis getChassis() {
@@ -368,6 +378,9 @@ public class RobotContainer extends Robot {
             telemetry.addData("Slow Mode", slowHeld());
             telemetry.addData("Holding Position", holdHeld());
             telemetry.addData("Ready To Shoot", readyToShoot());
+        } else {
+            telemetry.addData("Auto Step", autoStepText);
+            telemetry.addData("Auto Aim Error (deg)", limelight.getAimErrorDeg(chassis.getPose()));
         }
         telemetry.addData("Loop Time", timer.milliseconds());
         telemetry.update();

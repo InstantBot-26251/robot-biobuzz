@@ -7,7 +7,7 @@ public class DriveConstants {
     public static double RED_DRIVER_FORWARD_DEG = 90;
     public static double BLUE_DRIVER_FORWARD_DEG = 270;
 
-    public static double AIM_P = 1.6;
+    public static double AIM_P = 3.0;
     public static double AIM_D = 0.08;
     public static double AIM_KS = 0.04;
     public static double AIM_MAX_TURN = 0.8;
@@ -15,8 +15,8 @@ public class DriveConstants {
 
     public static double AIM_FEED_TOLERANCE_DEG = 3.0;
 
-    public static double SEARCH_STEP_DEG = 60;
-    public static long SEARCH_TIMEOUT_MS = 5000;
+    public static double SEARCH_TURN_POWER = 0.75;
+    public static long SEARCH_TIMEOUT_MS = 12000;
 
     public static double SLOW_MODE_DRIVE_SCALE = 0.35;
     public static double SLOW_MODE_TURN_SCALE = 0.45;
