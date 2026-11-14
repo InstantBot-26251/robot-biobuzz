@@ -29,10 +29,10 @@ public class Red1ShootPark extends AutoFactory {
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
     private final Pose start = poseFactory.of(56, 8.8144, 90);
-    private final Pose shootSpot = poseFactory.of(56, 26.6345, 90);
+    private final Pose shootSpot = poseFactory.of(56, 22, 90);
     private final Pose point2 = poseFactory.of(33, 26.63, 90);
     private final Pose point3 = poseFactory.of(33, 115, 90);
-    private final Pose point4 = poseFactory.of(15, 115, 180);
+    private final Pose point4 = poseFactory.of(20, 115, 180);
 
     public Path path1() {
         return Paths.line(start, shootSpot).constant(start);

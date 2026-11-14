@@ -57,7 +57,7 @@ public class ShooterConstants {
     public static double ENCODER_DEAD_RPM = 200;
     public static long ENCODER_DEAD_MS = 1000;
 
-    public static double SERVO_POWER = 0.75;
+    public static double SERVO_POWER = 1.0;
     public static double VOLLEY_SERVO_POWER = 0.5;
     public static double VOLLEY_MAX_EXTRA_POWER = 0.05;
     public static double MANUAL_TRIM_STEP_RPM = 100;
