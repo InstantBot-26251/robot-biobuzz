@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.auto;
+package org.firstinspires.ftc.teamcode.opmodes.auto.blue;
 
 import com.pedropathing.api.Paths;
 import com.pedropathing.api.PoseFactory;
@@ -11,8 +11,8 @@ import com.seattlesolvers.solverslib.command.Commands;
 import org.firstinspires.ftc.teamcode.opmodes.Alliance;
 import org.firstinspires.ftc.teamcode.util.AutoFactory;
 
-@Autonomous(name = "Blue Alliance SP-C1")
-public class Blue1ShootPark extends AutoFactory {
+@Autonomous(name = "Blue Alliance Close SP-C1")
+public class Blue2ShootParkClose extends AutoFactory {
 
     @Override
     protected Alliance getAlliance() {
@@ -31,8 +31,8 @@ public class Blue1ShootPark extends AutoFactory {
     private final Pose start = poseFactory.of(56, 135.1856, 90);
     private final Pose shootSpot = poseFactory.of(56, 117.3655, 90);
     private final Pose point2 = poseFactory.of(33, 117.37, 90);
-    private final Pose point3 = poseFactory.of(33, 29, 90);
-    private final Pose point4 = poseFactory.of(15, 29, 0);
+    private final Pose point3 = poseFactory.of(33, 45, 90);
+    private final Pose point4 = poseFactory.of(15, 45, 0);
 
     public Path path1() {
         return Paths.line(start, shootSpot).constant(start);
