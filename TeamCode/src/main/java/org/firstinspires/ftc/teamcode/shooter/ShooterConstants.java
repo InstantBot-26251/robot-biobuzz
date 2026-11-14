@@ -7,9 +7,9 @@ public class ShooterConstants {
     public static double[] SHOT_DISTANCES_IN = {};
     public static double[] SHOT_RPMS = {};
 
-    public static double DEFAULT_RPM = 3000;
+    public static double DEFAULT_RPM = 2900;
 
-    public static double SHOT_RPM_OFFSET = 0;
+    public static double SHOT_RPM_OFFSET = 40;
 
     public static double SHOOTER_LEFT_IN = 0;
 
@@ -20,7 +20,7 @@ public class ShooterConstants {
     public static double FIXED_RPM = 3000;
     public static double FIXED_RPM_STEP = 100;
 
-    public static boolean VOLTAGE_COMPENSATION = true;
+    public static boolean VOLTAGE_COMPENSATION = false;
     public static double LOW_VOLTAGE_THRESHOLD = 11;
     public static double LOW_VOLTAGE_RPM_PER_VOLT = 100;
 

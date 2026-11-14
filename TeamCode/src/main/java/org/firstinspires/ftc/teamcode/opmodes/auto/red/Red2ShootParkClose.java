@@ -31,8 +31,8 @@ public class Red2ShootParkClose extends AutoFactory {
     private final Pose start = poseFactory.of(56, 8.8144, 90);
     private final Pose shootSpot = poseFactory.of(56, 22, 90);
     private final Pose point2 = poseFactory.of(33, 26.63, 90);
-    private final Pose point3 = poseFactory.of(33, 101, 90);
-    private final Pose point4 = poseFactory.of(20, 101, 180);
+    private final Pose point3 = poseFactory.of(33, 90.001, 90);
+    private final Pose point4 = poseFactory.of(20, 90.001, 180);
 
     public Path path1() {
         return Paths.line(start, shootSpot).constant(start);
