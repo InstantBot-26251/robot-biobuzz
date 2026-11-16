@@ -12,7 +12,6 @@ public class AutoConstants {
     public static long SHOT_READY_TIMEOUT_MS = 3000;
     public static long AIM_SETTLE_MS = 300;
     public static double AIM_SETTLE_MAX_DEG_PER_SEC = 50;
-
     public static long FIRST_FEED_TIME_MS = 500;
     public static long FEED_PAUSE_TIME_MS = 1000;
     public static long GROUP2_STEADY_MS = 1000;
