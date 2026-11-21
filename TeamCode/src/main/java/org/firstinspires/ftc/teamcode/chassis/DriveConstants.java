@@ -15,7 +15,7 @@ public class DriveConstants {
 
     public static double AIM_FEED_TOLERANCE_DEG = 3.0;
 
-    public static double SEARCH_TURN_POWER = 0.75;
+    public static double SEARCH_TURN_POWER = 0.4;
     public static long SEARCH_TIMEOUT_MS = 12000;
 
     public static double SLOW_MODE_DRIVE_SCALE = 0.35;

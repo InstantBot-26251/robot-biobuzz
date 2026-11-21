@@ -68,6 +68,7 @@ public class Blue2ShootParkClose extends AutoFactory {
                 robot.followPath(path1()),
                 robot.aimAndShoot(),
                 robot.followPath(path2()),
+                Commands.waitMillis(5000),
                 robot.followPath(park())
         );
     }
