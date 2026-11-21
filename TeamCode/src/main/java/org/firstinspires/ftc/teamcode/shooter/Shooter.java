@@ -66,6 +66,7 @@ public class Shooter extends SubsystemIF {
     private double lastPower = 0;
     private boolean feedRequested = false;
     private boolean feeding = false;
+    private double lockedRpm = Double.NaN;
     private boolean usingDistance = false;
     private final ElapsedTime loopTimer = new ElapsedTime();
     private final ElapsedTime inToleranceTimer = new ElapsedTime();
@@ -223,7 +224,6 @@ public class Shooter extends SubsystemIF {
         feedOverride = false;
     }
 
-    // Runs the feed wheels no matter what the speed checks say (used for the timed auto feed)
     public void setFeedOverride(boolean on) {
         feedOverride = on;
     }
@@ -307,6 +307,12 @@ public class Shooter extends SubsystemIF {
                 }
                 usingDistance = !Double.isNaN(rpm);
                 if (!usingDistance) rpm = DEFAULT_RPM;
+                if (!forcedFeedAllowed && feeding) {
+                    if (Double.isNaN(lockedRpm)) lockedRpm = rpm;
+                    rpm = lockedRpm;
+                } else {
+                    lockedRpm = Double.NaN;
+                }
                 return Math.max(MIN_RPM, Math.min(MAX_RPM, rpm + SHOT_RPM_OFFSET + extraRpm.getAsDouble() + trimRpm + lowVoltageBoostRpm()));
             case OFF:
             default:
@@ -362,7 +368,7 @@ public class Shooter extends SubsystemIF {
                 } else if (error < -2 * SHOOTER_VELOCITY_TOLERANCE) {
                     power = -Math.abs(MAX_SLOWDOWN_POWER);
                 }
-                // During an auto volley, recover gently so the speed doesn't overshoot between balls
+
                 if (feedLatched) power = Math.min(power, feedforward + VOLLEY_MAX_EXTRA_POWER);
             }
             power = Math.max(-Math.abs(MAX_SLOWDOWN_POWER), Math.min(1, power));
@@ -370,7 +376,6 @@ public class Shooter extends SubsystemIF {
 
         setBrake(!isSpinning());
 
-        // In auto, nudge the two sides toward the same speed (plus the right-side trim)
         double balance = 0;
         if (!forcedFeedAllowed && mode == Mode.AUTO && power > 0 && !encoderDead && !encoderMismatch) {
             balance = SIDE_BALANCE_P * (AUTO_RIGHT_RPM_TRIM - sideRpmDiff);
@@ -395,7 +400,7 @@ public class Shooter extends SubsystemIF {
         } else if (!GATE_FEED_ON_SPEED) {
             feeding = true;
         } else if (atTargetVelocity() && feedPermission.getAsBoolean()) {
-            // In auto, once the first ball goes keep feeding until the volley ends
+
             if (!forcedFeedAllowed && mode == Mode.AUTO) feedLatched = true;
             feeding = true;
             feedForced = false;
