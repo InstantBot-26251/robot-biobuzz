@@ -50,30 +50,6 @@ public class ChassisCommands {
         );
     }
 
-    // Spins in place at a steady, slow speed until a tag is seen or it has gone all the way around
-    public static Command createSearchCommand(Chassis chassis, Limelight limelight) {
-        ElapsedTime timer = new ElapsedTime();
-        double[] state = new double[2];
-        return new FunctionalCommand(
-                () -> {
-                    timer.reset();
-                    state[0] = chassis.getPose().heading();
-                    state[1] = 0;
-                },
-                () -> {
-                    double heading = chassis.getPose().heading();
-                    state[1] += Math.abs(TargetMath.normalizeAngle(heading - state[0]));
-                    state[0] = heading;
-                    chassis.setDrivePowers(0, 0, SEARCH_TURN_POWER);
-                },
-                interrupted -> chassis.holdCurrentPose(),
-                () -> limelight.isLive()
-                        || state[1] >= 2 * Math.PI
-                        || timer.milliseconds() > SEARCH_TIMEOUT_MS,
-                chassis
-        );
-    }
-
     public static Command createFollowPathCommand(Chassis chassis, Path path) {
         return createFollowPathCommand(chassis, path, true);
     }

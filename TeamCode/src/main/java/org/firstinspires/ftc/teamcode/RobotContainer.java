@@ -318,13 +318,8 @@ public class RobotContainer extends Robot {
                         Commands.waitUntil(limelight::isLive),
                         Commands.waitMillis(AutoConstants.TARGET_LOOK_MS)),
                 new ConditionalCommand(
-                        Commands.none(),
-                        Commands.sequence(autoStep("searching (spinning)"),
-                                ChassisCommands.createSearchCommand(chassis, limelight)),
-                        limelight::isLive),
-                new ConditionalCommand(
                         Commands.sequence(autoStep("aiming + shooting"), Commands.race(aim(), shooting)),
-                        Commands.sequence(autoStep("SKIPPED SHOT: never saw a tag"),
+                        Commands.sequence(autoStep("SKIPPED SHOT: no tag detected"),
                                 ShooterCommands.disableShooter(shooter)),
                         limelight::hasTarget),
                 autoStep("done shooting"));
