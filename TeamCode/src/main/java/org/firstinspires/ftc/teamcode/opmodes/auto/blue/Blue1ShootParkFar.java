@@ -28,12 +28,11 @@ public class Blue1ShootParkFar extends AutoFactory {
 
     private final PoseFactory poseFactory = PoseFactory.degrees().mirrorX(70.75).mirrorY(70.75);
 
-
-    private final Pose start = poseFactory.of(56, 8.8144, 90);
-    private final Pose shootSpot = poseFactory.of(56, 22, 90);
-    private final Pose point2 = poseFactory.of(33, 26.63, 90);
-    private final Pose point3 = poseFactory.of(33, 115, 90);
-    private final Pose point4 = poseFactory.of(20, 115, 180);
+    private final Pose start = poseFactory.of(55.6115, 8.6476, 90);
+    private final Pose shootSpot = poseFactory.of(55.6115, 23.9309, -90);
+    private final Pose point2 = poseFactory.of(32.2827, 23.93, 90);
+    private final Pose point3 = poseFactory.of(32.28, 119.08, 90.0016);
+    private final Pose point4 = poseFactory.of(13.6643, 121.554, 172.4298);
 
     public Path path1() {
         return Paths.line(start, shootSpot).constant(start);

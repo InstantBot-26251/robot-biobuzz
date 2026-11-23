@@ -322,7 +322,6 @@ public class RobotContainer extends Robot {
                         Commands.sequence(autoStep("searching (spinning)"),
                                 ChassisCommands.createSearchCommand(chassis, limelight)),
                         limelight::isLive),
-                // Aim at the hive if it was seen recently; shots still wait until the tags are in view
                 new ConditionalCommand(
                         Commands.sequence(autoStep("aiming + shooting"), Commands.race(aim(), shooting)),
                         Commands.sequence(autoStep("SKIPPED SHOT: never saw a tag"),
