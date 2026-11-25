@@ -62,6 +62,7 @@ public class RobotContainer extends Robot {
     private boolean wasAimLocked = false;
     private final ElapsedTime aimSettledTimer = new ElapsedTime();
     private boolean secondGroup = false;
+    private double autoShootHeading;
     private String autoStepText = "-";
     private final ElapsedTime shooterSteadyTimer = new ElapsedTime();
 
@@ -271,22 +272,20 @@ public class RobotContainer extends Robot {
     }
 
     public Command aim() {
+        double heading = chassis.getPose().heading();
         return chassis.runEnd(
-                () -> chassis.setDrivePowersFacing(0, 0, autoAimHeading()),
+                () -> chassis.setDrivePowersFacing(0, 0, heading),
                 chassis::stopFollower);
     }
 
-    private double autoAimHeading() {
-        Pose pose = chassis.getPose();
-        double hiveY = Alliance.getCurrent() == Alliance.RED ? VisionConstants.RED_HIVE_Y_IN : VisionConstants.BLUE_HIVE_Y_IN;
-        return Math.atan2(hiveY - pose.y(), VisionConstants.HIVE_CENTER_X_IN - pose.x());
-    }
-
     private boolean readyToFire() {
-        return limelight.isLive() && aimSettled();
+        return aimSettled();
     }
 
     public Command aimAndShoot() {
+        Command holdShootHeading = chassis.runEnd(
+                () -> chassis.setDrivePowersFacing(0, 0, autoShootHeading),
+                chassis::stopFollower);
         Command volley = Commands.sequence(
                 Commands.runOnce(() -> shooter.setFeedOverride(true)),
                 Commands.waitMillis(AutoConstants.FIRST_FEED_TIME_MS),
@@ -311,16 +310,11 @@ public class RobotContainer extends Robot {
                 ShooterCommands.disableShooter(shooter));
         return Commands.sequence(
                 ShooterCommands.enableShooter(shooter),
-                autoStep("looking for tags"),
-                Commands.race(
-                        aim(),
-                        Commands.waitUntil(limelight::isLive),
-                        Commands.waitMillis(AutoConstants.TARGET_LOOK_MS)),
-                new ConditionalCommand(
-                        Commands.sequence(autoStep("aiming + shooting"), Commands.race(aim(), shooting)),
-                        Commands.sequence(autoStep("SKIPPED SHOT: no tag detected"),
-                                ShooterCommands.disableShooter(shooter)),
-                        limelight::hasTarget),
+                Commands.runOnce(() -> {
+                    autoShootHeading = chassis.getPose().heading();
+                    autoStepText = "aiming + shooting";
+                }),
+                Commands.race(holdShootHeading, shooting),
                 autoStep("done shooting"));
     }
 
