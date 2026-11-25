@@ -28,9 +28,9 @@ public class Blue2ShootParkClose extends AutoFactory {
 
     private final PoseFactory poseFactory = PoseFactory.degrees().mirrorX(70.75).mirrorY(70.75);
 
-    private final Pose start = poseFactory.of(55.6115, 8.6476, 90);
-    private final Pose shootSpot = poseFactory.of(55.6115, 23.9309, -90);
-    private final Pose point2 = poseFactory.of(32.2827, 23.93, 90);
+    private final Pose start = poseFactory.of(55.6115, 8.6476, -90);
+    private final Pose shootSpot = poseFactory.of(55.6115, 19, -90);
+    private final Pose point2 = poseFactory.of(32.2827, 19, 90);
     private final Pose point3 = poseFactory.of(32.28, 93.08, 90.0023);
     private final Pose point4 = poseFactory.of(13.6643, 93.0597, -179.9376);
 

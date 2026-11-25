@@ -278,7 +278,6 @@ public class RobotContainer extends Robot {
 
     private double autoAimHeading() {
         Pose pose = chassis.getPose();
-        if (limelight.hasTarget()) return limelight.getAimFieldHeading(pose);
         double hiveY = Alliance.getCurrent() == Alliance.RED ? VisionConstants.RED_HIVE_Y_IN : VisionConstants.BLUE_HIVE_Y_IN;
         return Math.atan2(hiveY - pose.y(), VisionConstants.HIVE_CENTER_X_IN - pose.x());
     }
